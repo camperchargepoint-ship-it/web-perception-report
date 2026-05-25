@@ -216,14 +216,29 @@ export default function Home() {
       });
 
       if (!response.ok) {
-        const data = await response.json().catch(() => null);
+        const responseText = await response.text();
+        let data: { error?: string } | null = null;
+
+        try {
+          data = responseText ? JSON.parse(responseText) : null;
+        } catch {
+          data = null;
+        }
+
+        console.error("[lead-form] Error al enviar el lead", {
+          status: response.status,
+          statusText: response.statusText,
+          body: data ?? responseText,
+        });
+
         throw new Error(data?.error || "No se pudo enviar el lead.");
       }
 
       setLeadSubmissionStatus("success");
       setLeadSubmissionMessage("Datos enviados correctamente. Tu informe completo ya está desbloqueado.");
       setStage("results");
-    } catch {
+    } catch (error) {
+      console.error("[lead-form] Fallo en el envío del lead", error);
       setLeadSubmissionStatus("error");
       setLeadSubmissionMessage("No hemos podido enviar tus datos. Revisa la información e inténtalo de nuevo.");
     }
