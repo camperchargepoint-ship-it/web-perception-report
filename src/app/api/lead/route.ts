@@ -1,5 +1,4 @@
 import { analyzeWebsite, type WebsiteAnalysis } from "../../../lib/webAnalysis";
-import { captureWebsiteScreenshots, type WebsiteScreenshot } from "../../../lib/screenshot";
 
 const LEAD_RECIPIENT = "info@veronicavalero.com";
 const LEAD_SENDER = "Web Perception Report <noreply@veronicavalero.com>";
@@ -28,12 +27,6 @@ type ResendEmail = {
   text: string;
   html: string;
   reply_to?: string;
-  attachments?: Array<{
-    content: string;
-    filename: string;
-    content_id: string;
-    content_type: "image/jpeg";
-  }>;
 };
 
 const kpiLabels: Record<string, string> = {
@@ -95,8 +88,6 @@ const buildWebsiteAnalysisText = (analysis: WebsiteAnalysis) => [
   `URL normalizada: ${analysis.normalizedUrl || "No disponible"}`,
   `Título de página: ${analysis.pageTitle || "No detectado"}`,
   `H1 detectado: ${analysis.hasH1 ? analysis.h1Text || "Sí, sin texto disponible" : "No detectado"}`,
-  `Captura desktop: ${analysis.screenshots.desktop.hasScreenshot ? "Disponible" : "No disponible"}`,
-  `Captura móvil: ${analysis.screenshots.mobile.hasScreenshot ? "Disponible" : "No disponible"}`,
   "",
   "CTA detectados:",
   formatList(analysis.ctaCandidates, "No se han detectado CTA claros."),
@@ -147,62 +138,6 @@ const buildWebsiteAnalysisHtml = (
     </div>
   `;
 };
-
-const buildScreenshotImageHtml = (screenshot: WebsiteScreenshot, contentId: string, label: string) => {
-  if (!screenshot.hasScreenshot) {
-    return `
-      <div style="padding: 22px; border-radius: 20px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.10);">
-        <p style="margin: 0; color: #94a3b8; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.6;">
-          ${label}: captura no disponible.
-        </p>
-      </div>
-    `;
-  }
-
-  return `
-    <div style="overflow: hidden; border-radius: 20px; border: 1px solid rgba(255,255,255,0.12); background: #020617;">
-      <img src="cid:${contentId}" alt="${label}" style="display: block; width: 100%; height: auto;" />
-    </div>
-  `;
-};
-
-const buildScreenshotAttachments = (analysis: WebsiteAnalysis) => {
-  const attachments: ResendEmail["attachments"] = [];
-
-  if (analysis.screenshots.desktop.hasScreenshot) {
-    attachments.push({
-      content: analysis.screenshots.desktop.base64,
-      filename: "captura-desktop.jpg",
-      content_id: "desktop-screenshot",
-      content_type: "image/jpeg",
-    });
-  }
-
-  if (analysis.screenshots.mobile.hasScreenshot) {
-    attachments.push({
-      content: analysis.screenshots.mobile.base64,
-      filename: "captura-mobile.jpg",
-      content_id: "mobile-screenshot",
-      content_type: "image/jpeg",
-    });
-  }
-
-  return attachments;
-};
-
-const buildScreenshotsEmailHtml = (analysis: WebsiteAnalysis) => `
-  <div style="margin-top: 34px;">
-    <p style="margin: 0 0 16px; color: #fbbf24; font-family: Arial, sans-serif; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase;">Capturas automáticas</p>
-    <div style="margin-bottom: 18px;">
-      <p style="margin: 0 0 10px; color: #cbd5e1; font-family: Arial, sans-serif; font-size: 14px; font-weight: 700;">Vista desktop</p>
-      ${buildScreenshotImageHtml(analysis.screenshots.desktop, "desktop-screenshot", "Vista desktop")}
-    </div>
-    <div>
-      <p style="margin: 0 0 10px; color: #cbd5e1; font-family: Arial, sans-serif; font-size: 14px; font-weight: 700;">Vista móvil</p>
-      ${buildScreenshotImageHtml(analysis.screenshots.mobile, "mobile-screenshot", "Vista móvil")}
-    </div>
-  </div>
-`;
 
 const buildLeadEmail = (lead: EnrichedLeadPayload) => {
   const kpiText = formatKpiScores(lead.kpiScores);
@@ -325,7 +260,6 @@ const buildUserEmail = (lead: EnrichedLeadPayload) => {
                     </div>
 
                     ${buildWebsiteAnalysisHtml(lead.websiteAnalysis, "dark")}
-                    ${buildScreenshotsEmailHtml(lead.websiteAnalysis)}
 
                     <p style="margin: 34px 0 0; color: #94a3b8; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.7;">
                       Esta auditoría funciona como una primera brújula estratégica: claridad, percepción, conversión y experiencia móvil alineadas en una lectura compacta para tomar mejores decisiones.
@@ -407,10 +341,8 @@ export async function POST(request: Request) {
     return errorResponse("Los datos del lead están incompletos.", 400, message);
   }
 
-  const [websiteAnalysis, screenshots] = await Promise.all([
-    analyzeWebsite(payload.web),
-    captureWebsiteScreenshots(payload.web),
-  ]);
+  const websiteAnalysis = await analyzeWebsite(payload.web);
+  // Screenshots will be implemented later with an external screenshot API for Vercel serverless compatibility.
 
   const lead = {
     ...payload,
@@ -418,10 +350,7 @@ export async function POST(request: Request) {
     email: payload.email.trim(),
     web: payload.web.trim(),
     diagnosisSummary: payload.diagnosisSummary.trim(),
-    websiteAnalysis: {
-      ...websiteAnalysis,
-      screenshots,
-    },
+    websiteAnalysis,
   };
 
   console.error("[lead-api] Website analysis completed", lead.websiteAnalysis);
@@ -455,7 +384,6 @@ export async function POST(request: Request) {
       subject: userEmail.subject,
       text: userEmail.text,
       html: userEmail.html,
-      attachments: buildScreenshotAttachments(lead.websiteAnalysis),
     },
     "user report"
   );

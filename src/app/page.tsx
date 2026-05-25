@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { QuestionCard } from "../components/questions/QuestionCard";
 import type { Answers } from "../lib/scoring";
@@ -504,53 +503,6 @@ export default function Home() {
                 </li>
               )}
             </ul>
-          </div>
-        </div>
-
-        <div className="mt-7">
-          <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Capturas automáticas</p>
-          <div className="mt-4 grid gap-5 lg:grid-cols-[minmax(0,1.25fr)_minmax(220px,0.75fr)]">
-            <div className="rounded-3xl border border-white/5 bg-slate-950/75 p-4">
-              <div className="mb-3 flex items-center justify-between gap-3">
-                <p className="text-sm font-semibold text-white">Vista desktop</p>
-                <span className="text-xs uppercase tracking-[0.18em] text-slate-500">1440 px</span>
-              </div>
-              {websiteAnalysis?.screenshots.desktop.hasScreenshot ? (
-                <Image
-                  src={websiteAnalysis.screenshots.desktop.dataUrl}
-                  alt="Captura desktop del sitio analizado"
-                  width={websiteAnalysis.screenshots.desktop.width}
-                  height={websiteAnalysis.screenshots.desktop.height}
-                  unoptimized
-                  className="aspect-[16/10] w-full rounded-2xl border border-white/10 object-cover object-top"
-                />
-              ) : (
-                <div className="flex aspect-[16/10] items-center justify-center rounded-2xl border border-dashed border-white/10 bg-slate-900/80 px-6 text-center text-sm leading-6 text-slate-500">
-                  Captura desktop no disponible.
-                </div>
-              )}
-            </div>
-
-            <div className="rounded-3xl border border-white/5 bg-slate-950/75 p-4">
-              <div className="mb-3 flex items-center justify-between gap-3">
-                <p className="text-sm font-semibold text-white">Vista móvil</p>
-                <span className="text-xs uppercase tracking-[0.18em] text-slate-500">390 px</span>
-              </div>
-              {websiteAnalysis?.screenshots.mobile.hasScreenshot ? (
-                <Image
-                  src={websiteAnalysis.screenshots.mobile.dataUrl}
-                  alt="Captura móvil del sitio analizado"
-                  width={websiteAnalysis.screenshots.mobile.width}
-                  height={websiteAnalysis.screenshots.mobile.height}
-                  unoptimized
-                  className="mx-auto aspect-[9/16] max-h-[520px] w-full max-w-[260px] rounded-2xl border border-white/10 object-cover object-top"
-                />
-              ) : (
-                <div className="mx-auto flex aspect-[9/16] max-h-[520px] w-full max-w-[260px] items-center justify-center rounded-2xl border border-dashed border-white/10 bg-slate-900/80 px-6 text-center text-sm leading-6 text-slate-500">
-                  Captura móvil no disponible.
-                </div>
-              )}
-            </div>
           </div>
         </div>
       </section>
