@@ -74,6 +74,31 @@ const initialAnswers: Answers = {
   experienciaMovil: 5,
 };
 
+const createWebsiteAnalysisFallback = (web = ""): WebsiteAnalysis => ({
+  normalizedUrl: web,
+  pageTitle: "",
+  h1Text: "",
+  hasH1: false,
+  ctaCandidates: [],
+  hasCTA: false,
+  notes: ["No se ha podido mostrar el análisis automático del sitio."],
+});
+
+const normalizeWebsiteAnalysis = (
+  analysis: Partial<WebsiteAnalysis> | null | undefined,
+  web: string
+): WebsiteAnalysis => ({
+  normalizedUrl: analysis?.normalizedUrl || web,
+  pageTitle: analysis?.pageTitle || "",
+  h1Text: analysis?.h1Text || "",
+  hasH1: Boolean(analysis?.hasH1),
+  ctaCandidates: Array.isArray(analysis?.ctaCandidates) ? analysis.ctaCandidates : [],
+  hasCTA: Boolean(analysis?.hasCTA),
+  notes: Array.isArray(analysis?.notes) && analysis.notes.length > 0
+    ? analysis.notes
+    : createWebsiteAnalysisFallback(web).notes,
+});
+
 const getHostnameFromUrl = (value: string) => {
   const trimmedValue = value.trim();
 
@@ -236,7 +261,13 @@ export default function Home() {
         throw new Error(data?.error || "No se pudo enviar el lead.");
       }
 
-      setWebsiteAnalysis(data?.websiteAnalysis ?? null);
+      const receivedWebsiteAnalysis = normalizeWebsiteAnalysis(
+        data?.websiteAnalysis,
+        submittedGateData.web
+      );
+
+      console.error("[lead-form] Análisis automático recibido", receivedWebsiteAnalysis);
+      setWebsiteAnalysis(receivedWebsiteAnalysis);
       setLeadSubmissionStatus("success");
       setLeadSubmissionMessage("Datos enviados correctamente. Tu informe completo ya está desbloqueado.");
       setStage("results");

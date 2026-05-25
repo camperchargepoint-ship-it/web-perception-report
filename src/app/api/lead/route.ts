@@ -394,5 +394,16 @@ export async function POST(request: Request) {
     return errorResponse("No se pudo enviar el email de la auditoría al usuario.", 502, message);
   }
 
-  return Response.json({ ok: true, websiteAnalysis: lead.websiteAnalysis });
+  return Response.json({
+    ok: true,
+    websiteAnalysis: {
+      normalizedUrl: lead.websiteAnalysis.normalizedUrl,
+      pageTitle: lead.websiteAnalysis.pageTitle,
+      h1Text: lead.websiteAnalysis.h1Text,
+      hasH1: lead.websiteAnalysis.hasH1,
+      ctaCandidates: lead.websiteAnalysis.ctaCandidates,
+      hasCTA: lead.websiteAnalysis.hasCTA,
+      notes: lead.websiteAnalysis.notes,
+    },
+  });
 }
