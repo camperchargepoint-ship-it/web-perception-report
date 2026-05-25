@@ -1,10 +1,12 @@
 "use client";
 
+import Image from "next/image";
 import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { QuestionCard } from "../components/questions/QuestionCard";
 import type { Answers } from "../lib/scoring";
 import { generateReport } from "../lib/report";
 import type { WebsiteAnalysis } from "../lib/webAnalysis";
+import type { WebsiteScreenshot } from "../lib/screenshots";
 
 type QuestionKey = "claridad" | "percepcionMarca" | "conversion" | "experienciaMovil";
 
@@ -74,6 +76,20 @@ const initialAnswers: Answers = {
   experienciaMovil: 5,
 };
 
+const createScreenshotFallback = (
+  label: WebsiteScreenshot["label"],
+  width: number,
+  height: number,
+  error = "Captura no disponible."
+): WebsiteScreenshot => ({
+  dataUrl: "",
+  hasScreenshot: false,
+  width,
+  height,
+  label,
+  error,
+});
+
 const createWebsiteAnalysisFallback = (web = ""): WebsiteAnalysis => ({
   normalizedUrl: web,
   pageTitle: "",
@@ -82,6 +98,13 @@ const createWebsiteAnalysisFallback = (web = ""): WebsiteAnalysis => ({
   ctaCandidates: [],
   hasCTA: false,
   notes: ["No se ha podido mostrar el análisis automático del sitio."],
+  screenshots: {
+    desktopUrl: "",
+    mobileUrl: "",
+    desktop: createScreenshotFallback("desktop", 1440, 1100),
+    mobile: createScreenshotFallback("mobile", 390, 844),
+    notes: ["No hay capturas automáticas disponibles."],
+  },
 });
 
 const normalizeWebsiteAnalysis = (
@@ -97,6 +120,7 @@ const normalizeWebsiteAnalysis = (
   notes: Array.isArray(analysis?.notes) && analysis.notes.length > 0
     ? analysis.notes
     : createWebsiteAnalysisFallback(web).notes,
+  screenshots: analysis?.screenshots || createWebsiteAnalysisFallback(web).screenshots,
 });
 
 const getHostnameFromUrl = (value: string) => {
@@ -539,6 +563,61 @@ export default function Home() {
       </section>
     );
 
+    const renderScreenshotCard = (
+      screenshot: WebsiteScreenshot | undefined,
+      title: string,
+      description: string
+    ) => (
+      <article className="overflow-hidden rounded-[28px] border border-white/10 bg-slate-900/80 shadow-[0_24px_80px_rgba(15,23,42,0.35)]">
+        <div className="border-b border-white/10 px-5 py-5 sm:px-6">
+          <p className="text-xs uppercase tracking-[0.22em] text-amber-300/80">{title}</p>
+          <p className="mt-2 text-sm leading-6 text-slate-400">{description}</p>
+        </div>
+        <div className="bg-slate-950/80 p-3 sm:p-4">
+          {screenshot?.hasScreenshot && screenshot.dataUrl ? (
+            <Image
+              src={screenshot.dataUrl}
+              alt={title}
+              width={screenshot.width}
+              height={screenshot.height}
+              unoptimized
+              className="h-auto w-full rounded-[20px] border border-white/10 object-cover"
+            />
+          ) : (
+            <div className="flex min-h-64 items-center justify-center rounded-[20px] border border-dashed border-white/15 bg-white/[0.03] px-6 text-center text-sm leading-6 text-slate-400">
+              {screenshot?.error || "Captura no disponible."}
+            </div>
+          )}
+        </div>
+      </article>
+    );
+
+    const renderWebsiteScreenshots = () => (
+      <section className="space-y-5">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-[0.24em] text-amber-300/80">Vista visual</p>
+            <h3 className="mt-3 text-2xl font-semibold text-white">Capturas automáticas del sitio</h3>
+          </div>
+          <p className="max-w-md text-sm leading-6 text-slate-500">
+            Referencias visuales generadas para revisar la primera impresión en escritorio y móvil.
+          </p>
+        </div>
+        <div className="grid gap-6 lg:grid-cols-[1.35fr_0.75fr]">
+          {renderScreenshotCard(
+            websiteAnalysis?.screenshots?.desktop,
+            "Vista de escritorio",
+            "Lectura amplia de la composición, jerarquía y presencia visual."
+          )}
+          {renderScreenshotCard(
+            websiteAnalysis?.screenshots?.mobile,
+            "Vista móvil",
+            "Revisión compacta de claridad, foco y experiencia en pantalla pequeña."
+          )}
+        </div>
+      </section>
+    );
+
     return (
       <div className="mx-auto w-full max-w-5xl space-y-8 rounded-[32px] border border-white/10 bg-slate-950/95 p-6 shadow-[0_40px_120px_rgba(10,14,28,0.45)] backdrop-blur-xl sm:p-8 lg:p-10">
         <div className="space-y-5">
@@ -573,6 +652,7 @@ export default function Home() {
         </div>
 
         {renderWebsiteAnalysis()}
+        {renderWebsiteScreenshots()}
 
         <div className="grid gap-6 lg:grid-cols-2">
           <section className="rounded-[28px] border border-white/10 bg-slate-900/80 p-6 shadow-[0_24px_80px_rgba(15,23,42,0.35)]">

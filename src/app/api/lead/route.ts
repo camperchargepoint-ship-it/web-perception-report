@@ -1,4 +1,8 @@
 import { analyzeWebsite, type WebsiteAnalysis } from "../../../lib/webAnalysis";
+import {
+  generateWebsiteScreenshots,
+  type WebsiteScreenshot,
+} from "../../../lib/screenshots";
 
 const LEAD_RECIPIENT = "info@veronicavalero.com";
 const LEAD_SENDER = "Web Perception Report <noreply@veronicavalero.com>";
@@ -27,6 +31,12 @@ type ResendEmail = {
   text: string;
   html: string;
   reply_to?: string;
+  attachments?: Array<{
+    filename: string;
+    content: string;
+    content_type: string;
+    content_id?: string;
+  }>;
 };
 
 const kpiLabels: Record<string, string> = {
@@ -94,7 +104,82 @@ const buildWebsiteAnalysisText = (analysis: WebsiteAnalysis) => [
   "",
   "Notas automáticas:",
   formatList(analysis.notes, "No hay notas automáticas disponibles."),
+  "",
+  "Capturas automáticas:",
+  analysis.screenshots?.desktop.hasScreenshot
+    ? "Captura de escritorio generada correctamente."
+    : analysis.screenshots?.desktop.error || "Captura de escritorio no disponible.",
+  analysis.screenshots?.mobile.hasScreenshot
+    ? "Captura móvil generada correctamente."
+    : analysis.screenshots?.mobile.error || "Captura móvil no disponible.",
 ].join("\n");
+
+const buildScreenshotPreviewHtml = (
+  screenshot: WebsiteScreenshot | undefined,
+  label: string,
+  contentId: string
+) => {
+  const imageSource = screenshot?.hasScreenshot ? `cid:${contentId}` : "";
+
+  return `
+    <div style="margin: 0 0 18px; padding: 16px; border-radius: 22px; background: rgba(2, 6, 23, 0.62); border: 1px solid rgba(255,255,255,0.10);">
+      <p style="margin: 0 0 12px; color: #cbd5e1; font-family: Arial, sans-serif; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase;">${escapeHtml(label)}</p>
+      ${imageSource
+        ? `<img src="${imageSource}" alt="${escapeHtml(label)}" style="display: block; width: 100%; max-width: 100%; height: auto; border-radius: 16px; border: 1px solid rgba(255,255,255,0.10);" />`
+        : `<p style="margin: 0; color: #94a3b8; font-family: Arial, sans-serif; font-size: 14px; line-height: 1.7;">${escapeHtml(screenshot?.error || "Captura no disponible.")}</p>`}
+    </div>
+  `;
+};
+
+const buildWebsiteScreenshotsHtml = (analysis: WebsiteAnalysis) => {
+  const screenshots = analysis.screenshots;
+
+  return `
+    <div style="margin-top: 28px; padding: 28px; border-radius: 24px; background: rgba(15, 23, 42, 0.78); border: 1px solid rgba(255,255,255,0.10);">
+      <p style="margin: 0 0 16px; color: #fbbf24; font-family: Arial, sans-serif; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase;">Capturas automáticas</p>
+      ${buildScreenshotPreviewHtml(screenshots?.desktop, "Vista de escritorio", "desktop-screenshot")}
+      ${buildScreenshotPreviewHtml(screenshots?.mobile, "Vista móvil", "mobile-screenshot")}
+    </div>
+  `;
+};
+
+const getBase64FromDataUrl = (dataUrl: string) => {
+  const marker = ";base64,";
+  const markerIndex = dataUrl.indexOf(marker);
+  return markerIndex >= 0 ? dataUrl.slice(markerIndex + marker.length) : "";
+};
+
+const buildScreenshotAttachments = (analysis: WebsiteAnalysis): ResendEmail["attachments"] => {
+  const screenshots = analysis.screenshots;
+
+  if (!screenshots) return [];
+
+  return [
+    {
+      screenshot: screenshots.desktop,
+      filename: "captura-escritorio.jpg",
+      content_id: "desktop-screenshot",
+    },
+    {
+      screenshot: screenshots.mobile,
+      filename: "captura-movil.jpg",
+      content_id: "mobile-screenshot",
+    },
+  ].flatMap(({ screenshot, filename, content_id }) => {
+    if (!screenshot.hasScreenshot || !screenshot.dataUrl) return [];
+
+    const content = getBase64FromDataUrl(screenshot.dataUrl);
+
+    if (!content) return [];
+
+    return [{
+      filename,
+      content,
+      content_type: "image/jpeg",
+      content_id,
+    }];
+  });
+};
 
 const buildWebsiteAnalysisHtml = (
   analysis: WebsiteAnalysis,
@@ -260,6 +345,7 @@ const buildUserEmail = (lead: EnrichedLeadPayload) => {
                     </div>
 
                     ${buildWebsiteAnalysisHtml(lead.websiteAnalysis, "dark")}
+                    ${buildWebsiteScreenshotsHtml(lead.websiteAnalysis)}
 
                     <p style="margin: 34px 0 0; color: #94a3b8; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.7;">
                       Esta auditoría funciona como una primera brújula estratégica: claridad, percepción, conversión y experiencia móvil alineadas en una lectura compacta para tomar mejores decisiones.
@@ -341,8 +427,13 @@ export async function POST(request: Request) {
     return errorResponse("Los datos del lead están incompletos.", 400, message);
   }
 
-  const websiteAnalysis = await analyzeWebsite(payload.web);
-  // Screenshots will be implemented later with an external screenshot API for Vercel serverless compatibility.
+  const baseWebsiteAnalysis = await analyzeWebsite(payload.web);
+  // ScreenshotOne keeps screenshot generation compatible with Vercel serverless without browser automation.
+  const screenshots = await generateWebsiteScreenshots(payload.web);
+  const websiteAnalysis = {
+    ...baseWebsiteAnalysis,
+    screenshots,
+  };
 
   const lead = {
     ...payload,
@@ -376,6 +467,7 @@ export async function POST(request: Request) {
   }
 
   const userEmail = buildUserEmail(lead);
+  const screenshotAttachments = buildScreenshotAttachments(lead.websiteAnalysis);
   const userResponse = await sendResendEmail(
     resendApiKey,
     {
@@ -384,6 +476,7 @@ export async function POST(request: Request) {
       subject: userEmail.subject,
       text: userEmail.text,
       html: userEmail.html,
+      attachments: screenshotAttachments,
     },
     "user report"
   );
@@ -404,6 +497,7 @@ export async function POST(request: Request) {
       ctaCandidates: lead.websiteAnalysis.ctaCandidates,
       hasCTA: lead.websiteAnalysis.hasCTA,
       notes: lead.websiteAnalysis.notes,
+      screenshots: lead.websiteAnalysis.screenshots,
     },
   });
 }

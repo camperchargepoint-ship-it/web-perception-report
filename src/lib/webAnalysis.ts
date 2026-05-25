@@ -1,4 +1,5 @@
 import * as cheerio from "cheerio";
+import type { WebsiteScreenshots } from "./screenshots";
 
 export type WebsiteAnalysis = {
   normalizedUrl: string;
@@ -8,6 +9,7 @@ export type WebsiteAnalysis = {
   ctaCandidates: string[];
   hasCTA: boolean;
   notes: string[];
+  screenshots?: WebsiteScreenshots;
 };
 
 const CTA_KEYWORDS = [
