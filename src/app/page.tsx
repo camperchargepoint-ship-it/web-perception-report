@@ -4,6 +4,7 @@ import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { QuestionCard } from "../components/questions/QuestionCard";
 import type { Answers } from "../lib/scoring";
 import { generateReport } from "../lib/report";
+import type { WebsiteAnalysis } from "../lib/webAnalysis";
 
 type QuestionKey = "claridad" | "percepcionMarca" | "conversion" | "experienciaMovil";
 
@@ -112,6 +113,7 @@ export default function Home() {
     "idle" | "submitting" | "success" | "error"
   >("idle");
   const [leadSubmissionMessage, setLeadSubmissionMessage] = useState("");
+  const [websiteAnalysis, setWebsiteAnalysis] = useState<WebsiteAnalysis | null>(null);
 
   const progressLabel = useMemo(
     () => `${currentQuestion + 1} / ${questionSteps.length}`,
@@ -215,16 +217,16 @@ export default function Home() {
         }),
       });
 
+      const responseText = await response.text();
+      let data: { error?: string; websiteAnalysis?: WebsiteAnalysis } | null = null;
+
+      try {
+        data = responseText ? JSON.parse(responseText) : null;
+      } catch {
+        data = null;
+      }
+
       if (!response.ok) {
-        const responseText = await response.text();
-        let data: { error?: string } | null = null;
-
-        try {
-          data = responseText ? JSON.parse(responseText) : null;
-        } catch {
-          data = null;
-        }
-
         console.error("[lead-form] Error al enviar el lead", {
           status: response.status,
           statusText: response.statusText,
@@ -234,6 +236,7 @@ export default function Home() {
         throw new Error(data?.error || "No se pudo enviar el lead.");
       }
 
+      setWebsiteAnalysis(data?.websiteAnalysis ?? null);
       setLeadSubmissionStatus("success");
       setLeadSubmissionMessage("Datos enviados correctamente. Tu informe completo ya está desbloqueado.");
       setStage("results");
@@ -438,11 +441,78 @@ export default function Home() {
       experienciaMovil: "Experiencia móvil",
     };
 
+    const renderWebsiteAnalysis = () => (
+      <section className="rounded-[28px] border border-white/10 bg-slate-900/80 p-6 shadow-[0_24px_80px_rgba(15,23,42,0.35)] sm:p-8">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-[0.24em] text-amber-300/80">Lectura técnica</p>
+            <h3 className="mt-3 text-2xl font-semibold text-white">Análisis automático del sitio</h3>
+          </div>
+          <div className="rounded-full bg-slate-950/80 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-400 ring-1 ring-white/10">
+            {websiteAnalysis?.normalizedUrl ? "Sitio analizado" : "Análisis no disponible"}
+          </div>
+        </div>
+
+        <div className="mt-7 grid gap-4 md:grid-cols-2">
+          <div className="rounded-3xl border border-white/5 bg-slate-950/75 p-5">
+            <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Título de página</p>
+            <p className="mt-3 text-base leading-7 text-slate-100">
+              {websiteAnalysis?.pageTitle || "No detectado"}
+            </p>
+          </div>
+          <div className="rounded-3xl border border-white/5 bg-slate-950/75 p-5">
+            <p className="text-xs uppercase tracking-[0.18em] text-slate-500">H1 detectado</p>
+            <p className="mt-3 text-base leading-7 text-slate-100">
+              {websiteAnalysis?.hasH1
+                ? websiteAnalysis.h1Text || "Sí, sin texto disponible"
+                : "No detectado"}
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-5 lg:grid-cols-2">
+          <div className="rounded-3xl border border-white/5 bg-slate-950/75 p-5">
+            <p className="text-xs uppercase tracking-[0.18em] text-slate-500">CTA detectados</p>
+            <ul className="mt-4 space-y-3 text-sm leading-6 text-slate-300">
+              {websiteAnalysis?.ctaCandidates.length ? (
+                websiteAnalysis.ctaCandidates.map((item) => (
+                  <li key={item} className="rounded-2xl bg-white/[0.03] px-4 py-3">
+                    {item}
+                  </li>
+                ))
+              ) : (
+                <li className="rounded-2xl bg-white/[0.03] px-4 py-3">
+                  No se han detectado CTA claros.
+                </li>
+              )}
+            </ul>
+          </div>
+
+          <div className="rounded-3xl border border-white/5 bg-slate-950/75 p-5">
+            <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Notas automáticas</p>
+            <ul className="mt-4 space-y-3 text-sm leading-6 text-slate-300">
+              {websiteAnalysis?.notes.length ? (
+                websiteAnalysis.notes.map((item) => (
+                  <li key={item} className="rounded-2xl bg-white/[0.03] px-4 py-3">
+                    {item}
+                  </li>
+                ))
+              ) : (
+                <li className="rounded-2xl bg-white/[0.03] px-4 py-3">
+                  No hay notas automáticas disponibles.
+                </li>
+              )}
+            </ul>
+          </div>
+        </div>
+      </section>
+    );
+
     return (
-      <div className="mx-auto w-full max-w-4xl space-y-10 rounded-[32px] border border-white/10 bg-slate-950/95 p-10 shadow-[0_40px_120px_rgba(10,14,28,0.45)] backdrop-blur-xl">
-        <div className="space-y-4">
+      <div className="mx-auto w-full max-w-5xl space-y-8 rounded-[32px] border border-white/10 bg-slate-950/95 p-6 shadow-[0_40px_120px_rgba(10,14,28,0.45)] backdrop-blur-xl sm:p-8 lg:p-10">
+        <div className="space-y-5">
           <p className="text-sm uppercase tracking-[0.28em] text-amber-300/90">Resultado premium</p>
-          <h2 className="text-4xl font-semibold text-white">Resumen de auditoría</h2>
+          <h2 className="text-3xl font-semibold leading-tight text-white sm:text-4xl">Resumen de auditoría</h2>
           {leadSubmissionStatus === "success" ? (
             <div className="rounded-3xl border border-emerald-300/20 bg-emerald-300/10 px-5 py-4 text-sm leading-6 text-emerald-100">
               {leadSubmissionMessage}
@@ -470,6 +540,9 @@ export default function Home() {
             <p className="mt-4 text-sm leading-7 text-slate-400">{report?.diagnosis.emotionalSummary}</p>
           </section>
         </div>
+
+        {renderWebsiteAnalysis()}
+
         <div className="grid gap-6 lg:grid-cols-2">
           <section className="rounded-[28px] border border-white/10 bg-slate-900/80 p-6 shadow-[0_24px_80px_rgba(15,23,42,0.35)]">
             <h3 className="text-xl font-semibold text-white">Áreas débiles</h3>

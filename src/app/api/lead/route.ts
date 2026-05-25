@@ -1,3 +1,5 @@
+import { analyzeWebsite, type WebsiteAnalysis } from "../../../lib/webAnalysis";
+
 const LEAD_RECIPIENT = "info@veronicavalero.com";
 const LEAD_SENDER = "Web Perception Report <noreply@veronicavalero.com>";
 const RESEND_EMAIL_API_URL = "https://api.resend.com/emails";
@@ -12,6 +14,10 @@ type LeadPayload = {
   kpiScores: KpiScores;
   diagnosisSummary: string;
   opportunities: string[];
+};
+
+type EnrichedLeadPayload = LeadPayload & {
+  websiteAnalysis: WebsiteAnalysis;
 };
 
 type ResendEmail = {
@@ -75,9 +81,68 @@ const formatKpiScores = (scores: KpiScores) =>
     })
     .join("\n");
 
-const buildLeadEmail = (lead: LeadPayload) => {
+const formatList = (items: string[], fallback: string) =>
+  items.length > 0 ? items.map((item) => `- ${item}`).join("\n") : fallback;
+
+const buildWebsiteAnalysisText = (analysis: WebsiteAnalysis) => [
+  `URL normalizada: ${analysis.normalizedUrl || "No disponible"}`,
+  `Título de página: ${analysis.pageTitle || "No detectado"}`,
+  `H1 detectado: ${analysis.hasH1 ? analysis.h1Text || "Sí, sin texto disponible" : "No detectado"}`,
+  "",
+  "CTA detectados:",
+  formatList(analysis.ctaCandidates, "No se han detectado CTA claros."),
+  "",
+  "Notas automáticas:",
+  formatList(analysis.notes, "No hay notas automáticas disponibles."),
+].join("\n");
+
+const buildWebsiteAnalysisHtml = (
+  analysis: WebsiteAnalysis,
+  variant: "light" | "dark"
+) => {
+  const isDark = variant === "dark";
+  const borderColor = isDark ? "rgba(255,255,255,0.10)" : "#e5e7eb";
+  const mutedColor = isDark ? "#94a3b8" : "#4b5563";
+  const textColor = isDark ? "#e2e8f0" : "#111827";
+  const panelBackground = isDark ? "rgba(15, 23, 42, 0.78)" : "#f9fafb";
+  const accentColor = isDark ? "#fbbf24" : "#92400e";
+
+  const ctaItems = analysis.ctaCandidates.length > 0
+    ? analysis.ctaCandidates.map((item) => `<li>${escapeHtml(item)}</li>`).join("")
+    : "<li>No se han detectado CTA claros.</li>";
+  const noteItems = analysis.notes.length > 0
+    ? analysis.notes.map((item) => `<li>${escapeHtml(item)}</li>`).join("")
+    : "<li>No hay notas automáticas disponibles.</li>";
+
+  return `
+    <div style="margin-top: 28px; padding: 28px; border-radius: 24px; background: ${panelBackground}; border: 1px solid ${borderColor};">
+      <p style="margin: 0 0 16px; color: ${accentColor}; font-family: Arial, sans-serif; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase;">Análisis automático del sitio</p>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse; color: ${textColor}; font-family: Arial, sans-serif;">
+        <tr>
+          <td style="padding: 10px 0; color: ${mutedColor}; font-size: 13px;">Título de página</td>
+          <td align="right" style="padding: 10px 0; font-size: 14px; font-weight: 700;">${escapeHtml(analysis.pageTitle || "No detectado")}</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px 0; color: ${mutedColor}; font-size: 13px;">H1 detectado</td>
+          <td align="right" style="padding: 10px 0; font-size: 14px; font-weight: 700;">${escapeHtml(analysis.hasH1 ? analysis.h1Text || "Sí, sin texto disponible" : "No detectado")}</td>
+        </tr>
+      </table>
+      <div style="margin-top: 18px;">
+        <p style="margin: 0 0 8px; color: ${mutedColor}; font-family: Arial, sans-serif; font-size: 13px;">CTA detectados</p>
+        <ul style="margin: 0; padding-left: 18px; color: ${textColor}; font-family: Arial, sans-serif; font-size: 14px; line-height: 1.7;">${ctaItems}</ul>
+      </div>
+      <div style="margin-top: 18px;">
+        <p style="margin: 0 0 8px; color: ${mutedColor}; font-family: Arial, sans-serif; font-size: 13px;">Notas automáticas</p>
+        <ul style="margin: 0; padding-left: 18px; color: ${textColor}; font-family: Arial, sans-serif; font-size: 14px; line-height: 1.7;">${noteItems}</ul>
+      </div>
+    </div>
+  `;
+};
+
+const buildLeadEmail = (lead: EnrichedLeadPayload) => {
   const kpiText = formatKpiScores(lead.kpiScores);
   const opportunitiesText = lead.opportunities.map((item) => `- ${item}`).join("\n");
+  const websiteAnalysisText = buildWebsiteAnalysisText(lead.websiteAnalysis);
 
   const htmlKpis = Object.entries(lead.kpiScores)
     .map(([key, value]) => {
@@ -105,6 +170,9 @@ const buildLeadEmail = (lead: LeadPayload) => {
       "Resumen del diagnóstico:",
       lead.diagnosisSummary,
       "",
+      "Análisis automático del sitio:",
+      websiteAnalysisText,
+      "",
       "Oportunidades:",
       opportunitiesText,
     ].join("\n"),
@@ -118,6 +186,7 @@ const buildLeadEmail = (lead: LeadPayload) => {
         <ul>${htmlKpis}</ul>
         <h2 style="font-size: 18px; margin-top: 24px;">Resumen del diagnóstico</h2>
         <p>${escapeHtml(lead.diagnosisSummary)}</p>
+        ${buildWebsiteAnalysisHtml(lead.websiteAnalysis, "light")}
         <h2 style="font-size: 18px; margin-top: 24px;">Oportunidades</h2>
         <ul>${htmlOpportunities}</ul>
       </div>
@@ -125,7 +194,7 @@ const buildLeadEmail = (lead: LeadPayload) => {
   };
 };
 
-const buildUserEmail = (lead: LeadPayload) => {
+const buildUserEmail = (lead: EnrichedLeadPayload) => {
   const htmlKpis = Object.entries(lead.kpiScores)
     .map(([key, value]) => {
       const label = kpiLabels[key] ?? key;
@@ -157,6 +226,9 @@ const buildUserEmail = (lead: LeadPayload) => {
       "Resumen del diagnóstico:",
       lead.diagnosisSummary,
       "",
+      "Análisis automático del sitio:",
+      buildWebsiteAnalysisText(lead.websiteAnalysis),
+      "",
       "Gracias por completar la auditoría.",
     ].join("\n"),
     html: `
@@ -186,6 +258,8 @@ const buildUserEmail = (lead: LeadPayload) => {
                         ${escapeHtml(lead.diagnosisSummary)}
                       </p>
                     </div>
+
+                    ${buildWebsiteAnalysisHtml(lead.websiteAnalysis, "dark")}
 
                     <p style="margin: 34px 0 0; color: #94a3b8; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.7;">
                       Esta auditoría funciona como una primera brújula estratégica: claridad, percepción, conversión y experiencia móvil alineadas en una lectura compacta para tomar mejores decisiones.
@@ -273,7 +347,10 @@ export async function POST(request: Request) {
     email: payload.email.trim(),
     web: payload.web.trim(),
     diagnosisSummary: payload.diagnosisSummary.trim(),
+    websiteAnalysis: await analyzeWebsite(payload.web),
   };
+
+  console.error("[lead-api] Website analysis completed", lead.websiteAnalysis);
 
   const internalEmail = buildLeadEmail(lead);
   const internalResponse = await sendResendEmail(
@@ -314,5 +391,5 @@ export async function POST(request: Request) {
     return errorResponse("No se pudo enviar el email de la auditoría al usuario.", 502, message);
   }
 
-  return Response.json({ ok: true });
+  return Response.json({ ok: true, websiteAnalysis: lead.websiteAnalysis });
 }
