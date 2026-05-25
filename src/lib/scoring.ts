@@ -1,23 +1,18 @@
-export type UserAnswers = {
-  accessibilityAwareness: number;
-  performancePerception: number;
-  usabilityFlow: number;
-  engagementRetention: number;
-  navigationClarity: number;
-  visualConfidence: number;
-  emotionalConnection: number;
-  interactionReliability: number;
+export type Answers = {
+  claridad: number;
+  percepcionMarca: number;
+  conversion: number;
+  experienciaMovil: number;
   brandPositioning?: string;
   strategicFocus?: string;
 };
 
-export type Answers = UserAnswers;
-
 export type KpiScores = {
-  accessibility: number;
-  performance: number;
-  usability: number;
-  engagement: number;
+  claridad: number;
+  confianza: number;
+  percepcionDeMarca: number;
+  conversion: number;
+  experienciaMovil: number;
 };
 
 const clamp = (value: number, min = 0, max = 1) => Math.max(min, Math.min(max, value));
@@ -30,33 +25,25 @@ const weightedAverage = (values: Array<{ value: number; weight: number }>) => {
   return clamp(values.reduce((sum, item) => sum + item.value * item.weight, 0) / totalWeight);
 };
 
-export function calculateKpiScores(answers: UserAnswers): KpiScores {
+export function calculateScores(answers: Answers): KpiScores {
+  const claridad = normalizeAnswer(answers.claridad);
+  const percepcionDeMarca = normalizeAnswer(answers.percepcionMarca);
+  const conversion = normalizeAnswer(answers.conversion);
+  const experienciaMovil = normalizeAnswer(answers.experienciaMovil);
+
   return {
-    accessibility: weightedAverage([
-      { value: normalizeAnswer(answers.accessibilityAwareness), weight: 0.5 },
-      { value: normalizeAnswer(answers.navigationClarity), weight: 0.3 },
-      { value: normalizeAnswer(answers.visualConfidence), weight: 0.2 },
+    claridad,
+    confianza: weightedAverage([
+      { value: claridad, weight: 0.55 },
+      { value: percepcionDeMarca, weight: 0.45 },
     ]),
-    performance: weightedAverage([
-      { value: normalizeAnswer(answers.performancePerception), weight: 0.6 },
-      { value: normalizeAnswer(answers.interactionReliability), weight: 0.4 },
-    ]),
-    usability: weightedAverage([
-      { value: normalizeAnswer(answers.usabilityFlow), weight: 0.5 },
-      { value: normalizeAnswer(answers.navigationClarity), weight: 0.3 },
-      { value: normalizeAnswer(answers.visualConfidence), weight: 0.2 },
-    ]),
-    engagement: weightedAverage([
-      { value: normalizeAnswer(answers.engagementRetention), weight: 0.5 },
-      { value: normalizeAnswer(answers.emotionalConnection), weight: 0.3 },
-      { value: normalizeAnswer(answers.brandPositioning ? 10 : 5), weight: 0.2 },
-    ]),
+    percepcionDeMarca,
+    conversion,
+    experienciaMovil,
   };
 }
 
-export const calculateScores = calculateKpiScores;
-
-export function buildScoringContext(answers: UserAnswers) {
+export function buildScoringContext(answers: Answers) {
   return {
     brandName: answers.brandPositioning,
     focus: answers.strategicFocus,

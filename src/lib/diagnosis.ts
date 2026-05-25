@@ -12,11 +12,11 @@ export type DiagnosisReport = {
 };
 
 const scoreLabels: Array<[number, string]> = [
-  [0.8, "highly refined"],
-  [0.65, "solid"],
-  [0.5, "emerging"],
-  [0.35, "uneven"],
-  [0, "under-optimized"],
+  [0.8, "muy refinado"],
+  [0.65, "sólido"],
+  [0.5, "emergente"],
+  [0.35, "desigual"],
+  [0, "suboptimizado"],
 ];
 
 function normalizeScore(value: number): number {
@@ -24,53 +24,70 @@ function normalizeScore(value: number): number {
   return Number(clamped.toFixed(2));
 }
 
+function getLabelName(name: string) {
+  const labelNames: Record<string, string> = {
+    claridad: "Claridad",
+    confianza: "Confianza",
+    percepcionDeMarca: "Percepción de marca",
+    conversion: "Conversión",
+    experienciaMovil: "Experiencia móvil",
+  };
+
+  return labelNames[name] ?? name;
+}
+
 function interpretScore(name: string, value: number): string {
   const normalized = normalizeScore(value);
-  const label = scoreLabels.find(([threshold]) => normalized >= threshold)?.[1] ?? "developing";
-  return `${name} sits at ${Math.round(normalized * 100)}%, which feels ${label} for a premium experience.`;
+  const label = scoreLabels.find(([threshold]) => normalized >= threshold)?.[1] ?? "en desarrollo";
+  return `${getLabelName(name)} está en ${Math.round(normalized * 100)}%, lo que se percibe como ${label} para una experiencia premium.`;
 }
 
 function emotionalTone(summary: string): string {
-  return `A carefully considered audit voice observes that ${summary}`;
+  return `Una voz de auditoría cuidadosamente considerada observa que ${summary}`;
 }
 
 function deriveWeakAreas(scores: Record<string, number>): string[] {
   return Object.entries(scores)
     .filter(([, value]) => normalizeScore(value) < 0.65)
-    .map(([key]) => `${key} requires closer attention to elevate the experience.`);
+    .map(([key]) => `${getLabelName(key)} requiere atención para elevar la experiencia.`);
 }
 
 function deriveOpportunities(scores: Record<string, number>): string[] {
   const opportunities: string[] = [];
 
-  if ((normalizeScore(scores.accessibility ?? 0)) < 0.75) {
+  if ((normalizeScore(scores.claridad ?? 0)) < 0.75) {
     opportunities.push(
-      "Refine accessibility touchpoints with clearer hierarchy and interaction cues to make the interface more inclusive and intuitive."
+      "Clarifica el mensaje principal y simplifica la jerarquía para que el usuario entienda inmediatamente lo que ofreces."
     );
   }
 
-  if ((normalizeScore(scores.performance ?? 0)) < 0.80) {
+  if ((normalizeScore(scores.confianza ?? 0)) < 0.80) {
     opportunities.push(
-      "Optimize fast-path interactions and perceptual performance so the experience feels seamless under real customer conditions."
+      "Refuerza la coherencia visual y el tono para generar una sensación de confianza desde el primer contacto."
     );
   }
 
-  if ((normalizeScore(scores.usability ?? 0)) < 0.75) {
+  if ((normalizeScore(scores.percepcionDeMarca ?? 0)) < 0.75) {
     opportunities.push(
-      "Align navigation and content structure with user intent to reduce friction and strengthen confidence in each touchpoint."
+      "Alinea la identidad de marca con el valor que ofreces para destacar con más claridad frente a la competencia."
     );
   }
 
-  if ((normalizeScore(scores.engagement ?? 0)) < 0.85) {
+  if ((normalizeScore(scores.conversion ?? 0)) < 0.75) {
     opportunities.push(
-      "Elevate emotional resonance through curated microcopy, purposeful motion, and more elegant interaction rhythms."
+      "Optimiza los llamados a la acción y los puntos de decisión para transformar más visitas en resultados tangibles."
     );
+  }
 
+  if ((normalizeScore(scores.experienciaMovil ?? 0)) < 0.85) {
+    opportunities.push(
+      "Mejora la experiencia móvil con interacciones más fluidas y una presentación adaptada al contexto del usuario."
+    );
   }
 
   if (opportunities.length === 0) {
     opportunities.push(
-      "Continue refining the experience with small, strategic improvements that reinforce your premium position and preserve momentum."
+      "Sigue refinando con ajustes estratégicos que refuercen tu posición premium sin perder elegancia." 
     );
   }
 
@@ -88,9 +105,9 @@ export function diagnoseKPIs(
   const interpretations = Object.entries(normalizedScores).map(([name, value]) => interpretScore(name, value));
 
   const assessment = [
-    options.brandName ? `${options.brandName} receives a premium audit that is balanced and strategic.` : "The audit delivers a measured, premium assessment.",
-    options.focus ? `It is especially attuned to ${options.focus}.` : "It is designed to feel like a high-end UX review.",
-    "No component is crowned flawless; the focus is on momentum, nuance, and clear direction.",
+    options.brandName ? `${options.brandName} recibe una auditoría premium equilibrada y estratégica.` : "El análisis ofrece una evaluación medida y de alto nivel.",
+    options.focus ? `Está especialmente orientado a ${options.focus}.` : "Se diseña para sentirse como una revisión UX editorial y de lujo.",
+    "Ningún componente se presenta como perfecto; el énfasis está en el impulso, la sutileza y la claridad estratégica.",
   ].join(" ");
 
   const emotionalSummary = emotionalTone(
@@ -112,38 +129,41 @@ export function diagnoseKPIs(
 export const mockDiagnosisExamples = {
   good: diagnoseKPIs(
     {
-      accessibility: 0.88,
-      performance: 0.93,
-      usability: 0.89,
-      engagement: 0.86,
+      claridad: 0.88,
+      confianza: 0.93,
+      percepcionDeMarca: 0.89,
+      conversion: 0.86,
+      experienciaMovil: 0.87,
     },
     {
       brandName: "Elevate Studio",
-      focus: "premium conversion journeys",
+      focus: "audiencia premium",
     }
   ),
   medium: diagnoseKPIs(
     {
-      accessibility: 0.72,
-      performance: 0.65,
-      usability: 0.70,
-      engagement: 0.78,
+      claridad: 0.72,
+      confianza: 0.65,
+      percepcionDeMarca: 0.70,
+      conversion: 0.78,
+      experienciaMovil: 0.74,
     },
     {
       brandName: "Canvas Collective",
-      focus: "user confidence and retention",
+      focus: "alineación de marca",
     }
   ),
   weak: diagnoseKPIs(
     {
-      accessibility: 0.48,
-      performance: 0.52,
-      usability: 0.50,
-      engagement: 0.43,
+      claridad: 0.48,
+      confianza: 0.52,
+      percepcionDeMarca: 0.50,
+      conversion: 0.43,
+      experienciaMovil: 0.46,
     },
     {
       brandName: "Foundry Labs",
-      focus: "baseline product experience",
+      focus: "experiencia móvil y conversión",
     }
   ),
 };
