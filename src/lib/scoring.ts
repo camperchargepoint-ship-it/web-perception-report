@@ -11,6 +11,8 @@ export type UserAnswers = {
   strategicFocus?: string;
 };
 
+export type Answers = UserAnswers;
+
 export type KpiScores = {
   accessibility: number;
   performance: number;
@@ -51,6 +53,8 @@ export function calculateKpiScores(answers: UserAnswers): KpiScores {
     ]),
   };
 }
+
+export const calculateScores = calculateKpiScores;
 
 export function buildScoringContext(answers: UserAnswers) {
   return {

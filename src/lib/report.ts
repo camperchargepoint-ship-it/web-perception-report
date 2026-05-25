@@ -1,34 +1,28 @@
-import { buildScoringContext, calculateKpiScores, KpiScores, UserAnswers } from "./scoring";
+import { calculateScores, Answers } from "./scoring";
 import { diagnoseKPIs, DiagnosisReport } from "./diagnosis";
 
 export type FullReport = {
-  answers: UserAnswers;
-  kpiScores: KpiScores;
+  answers: Answers;
+  kpiScores: ReturnType<typeof calculateScores>;
   diagnosis: DiagnosisReport;
-  overview: {
-    brandName?: string;
-    focus?: string;
-    headline: string;
-  };
+  summary: string;
+  weakAreas: string[];
+  improvementOpportunities: string[];
 };
 
-export function generateReport(userAnswers: UserAnswers): FullReport {
-  const kpiScores = calculateKpiScores(userAnswers);
-  const context = buildScoringContext(userAnswers);
-  const diagnosis = diagnoseKPIs(kpiScores, context);
-
-  const overviewHeadline = context.focus
-    ? `Strategic insights focused on ${context.focus}.`
-    : "A premium review of performance, usability, accessibility, and engagement.";
+export function generateReport(answers: Answers): FullReport {
+  const kpiScores = calculateScores(answers);
+  const diagnosis = diagnoseKPIs(kpiScores, {
+    brandName: answers.brandPositioning,
+    focus: answers.strategicFocus,
+  });
 
   return {
-    answers: userAnswers,
+    answers,
     kpiScores,
     diagnosis,
-    overview: {
-      brandName: context.brandName,
-      focus: context.focus,
-      headline: overviewHeadline,
-    },
+    summary: diagnosis.assessment,
+    weakAreas: diagnosis.weakAreas,
+    improvementOpportunities: diagnosis.improvementOpportunities,
   };
 }
