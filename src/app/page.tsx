@@ -1,9 +1,9 @@
 "use client";
 
 import { type FormEvent, useEffect, useMemo, useState } from "react";
-import { QuestionCard } from "../src/components/questions/QuestionCard";
-import type { Answers } from "../src/lib/scoring";
-import { generateReport } from "../src/lib/report";
+import { QuestionCard } from "../components/questions/QuestionCard";
+import type { Answers } from "../lib/scoring";
+import { generateReport } from "../lib/report";
 
 type QuestionKey = "claridad" | "percepcionMarca" | "conversion" | "experienciaMovil";
 
@@ -108,6 +108,10 @@ export default function Home() {
     email: "",
     web: "",
   });
+  const [leadSubmissionStatus, setLeadSubmissionStatus] = useState<
+    "idle" | "submitting" | "success" | "error"
+  >("idle");
+  const [leadSubmissionMessage, setLeadSubmissionMessage] = useState("");
 
   const progressLabel = useMemo(
     () => `${currentQuestion + 1} / ${questionSteps.length}`,
@@ -182,7 +186,7 @@ export default function Home() {
     setStage("loading");
   };
 
-  const handleSubmitEmail = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmitEmail = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const submittedGateData = {
@@ -191,10 +195,38 @@ export default function Home() {
       web: gateFormData.web.trim(),
     };
 
-    if (!submittedGateData.nombre || !submittedGateData.email || !submittedGateData.web) return;
+    if (!submittedGateData.nombre || !submittedGateData.email || !submittedGateData.web || !report) return;
 
+    setLeadSubmissionStatus("submitting");
+    setLeadSubmissionMessage("");
     setGateFormData(submittedGateData);
-    setStage("results");
+
+    try {
+      const response = await fetch("/api/lead", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...submittedGateData,
+          kpiScores: report.kpiScores,
+          diagnosisSummary: report.summary,
+          opportunities: report.improvementOpportunities,
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        throw new Error(data?.error || "No se pudo enviar el lead.");
+      }
+
+      setLeadSubmissionStatus("success");
+      setLeadSubmissionMessage("Datos enviados correctamente. Tu informe completo ya está desbloqueado.");
+      setStage("results");
+    } catch {
+      setLeadSubmissionStatus("error");
+      setLeadSubmissionMessage("No hemos podido enviar tus datos. Revisa la información e inténtalo de nuevo.");
+    }
   };
 
   const renderHero = () => (
@@ -304,6 +336,7 @@ export default function Home() {
 
   const renderEmailGate = () => {
     const isFormValid = Object.values(gateFormData).every((value) => value.trim().length > 0);
+    const isSubmitting = leadSubmissionStatus === "submitting";
 
     return (
       <div className="mx-auto w-full max-w-3xl rounded-[32px] border border-white/10 bg-slate-950/95 p-10 shadow-[0_40px_120px_rgba(10,14,28,0.45)] backdrop-blur-xl">
@@ -359,13 +392,18 @@ export default function Home() {
           <div className="pt-4">
             <button
               type="submit"
-              disabled={!isFormValid}
+              disabled={!isFormValid || isSubmitting}
               className="w-full inline-flex items-center justify-center rounded-full bg-gradient-to-r from-amber-400 to-rose-400 px-6 py-4 text-sm font-semibold uppercase tracking-[0.18em] text-slate-950 transition duration-300 enabled:hover:-translate-y-0.5 enabled:hover:shadow-lg enabled:hover:shadow-amber-400/25 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Desbloquear informe completo
+              {isSubmitting ? "Enviando acceso" : "Desbloquear informe completo"}
             </button>
           </div>
         </form>
+        {leadSubmissionStatus === "error" ? (
+          <div className="mt-5 rounded-3xl border border-rose-300/20 bg-rose-400/10 p-4 text-sm leading-6 text-rose-100">
+            {leadSubmissionMessage}
+          </div>
+        ) : null}
         <div className="mt-8 rounded-3xl border border-white/10 bg-slate-900/70 p-5 text-slate-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
           <p className="text-xs uppercase tracking-[0.22em] text-slate-500">Privacidad protegida</p>
           <p className="mt-2 text-sm leading-6 text-slate-400">
@@ -390,6 +428,11 @@ export default function Home() {
         <div className="space-y-4">
           <p className="text-sm uppercase tracking-[0.28em] text-amber-300/90">Resultado premium</p>
           <h2 className="text-4xl font-semibold text-white">Resumen de auditoría</h2>
+          {leadSubmissionStatus === "success" ? (
+            <div className="rounded-3xl border border-emerald-300/20 bg-emerald-300/10 px-5 py-4 text-sm leading-6 text-emerald-100">
+              {leadSubmissionMessage}
+            </div>
+          ) : null}
           <p className="max-w-3xl text-base leading-7 text-slate-400">
             {report?.summary || "Tu revisión premium está lista."}
           </p>
