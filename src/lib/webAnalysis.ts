@@ -1,4 +1,5 @@
 import * as cheerio from "cheerio";
+import { emptyScreenshots, type WebsiteScreenshots } from "./screenshot";
 
 export type WebsiteAnalysis = {
   normalizedUrl: string;
@@ -8,6 +9,7 @@ export type WebsiteAnalysis = {
   ctaCandidates: string[];
   hasCTA: boolean;
   notes: string[];
+  screenshots: WebsiteScreenshots;
 };
 
 const CTA_KEYWORDS = [
@@ -30,6 +32,7 @@ const emptyAnalysis = (normalizedUrl: string, notes: string[]): WebsiteAnalysis 
   ctaCandidates: [],
   hasCTA: false,
   notes,
+  screenshots: emptyScreenshots(),
 });
 
 const normalizeUrl = (url: string) => {
@@ -143,6 +146,7 @@ export async function analyzeWebsite(url: string): Promise<WebsiteAnalysis> {
       hasH1: h1Text.length > 0,
       ctaCandidates,
       hasCTA: ctaCandidates.length > 0,
+      screenshots: emptyScreenshots(),
     };
 
     return {
