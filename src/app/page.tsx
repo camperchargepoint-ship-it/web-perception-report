@@ -163,7 +163,6 @@ const getHostnameFromUrl = (value: string) => {
 export default function Home() {
   const [stage, setStage] = useState<
     | "hero"
-    | "url"
     | "questions"
     | "loading"
     | "email"
@@ -197,9 +196,7 @@ export default function Home() {
   const stageTitle = useMemo(() => {
     switch (stage) {
       case "hero":
-        return "Diagnóstico web estratégico";
-      case "url":
-        return "Comienza con la página que deseas fortalecer.";
+        return "Análisis estratégico de tu sitio web";
       case "questions":
         return questionSteps[currentQuestion].question;
       case "loading":
@@ -219,10 +216,12 @@ export default function Home() {
     return undefined;
   }, [stage]);
 
-  const handleStart = () => setStage("url");
+  const handleHeroSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
 
-  const handleUrlNext = () => {
     const trimmedSiteUrl = siteUrl.trim();
+
+    if (!trimmedSiteUrl) return;
 
     setAnswers((prev) => ({
       ...prev,
@@ -337,46 +336,41 @@ export default function Home() {
   };
 
   const renderHero = () => (
-    <div className="mx-auto flex w-full max-w-3xl flex-col items-start gap-8 py-6 sm:py-10">
-      <div className="h-px w-full bg-white/10" />
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-        <button
-          type="button"
-          onClick={handleStart}
-          className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-slate-950 transition duration-300 hover:-translate-y-0.5 hover:bg-amber-200"
-        >
-          Empezar
-        </button>
+    <section className="mx-auto flex min-h-[62vh] w-full max-w-4xl flex-col justify-center gap-10 py-8 sm:py-14">
+      <div className="space-y-6">
+        <span className="inline-flex items-center rounded-full border border-amber-300/20 bg-amber-300/10 px-4 py-2 text-xs font-medium uppercase tracking-[0.24em] text-amber-200">
+          Diagnóstico premium
+        </span>
+        <div className="space-y-5">
+          <h1 className="max-w-4xl text-5xl font-semibold leading-[1.05] text-white sm:text-6xl lg:text-7xl">
+            Análisis estratégico de tu sitio web
+          </h1>
+          <p className="max-w-2xl text-base leading-8 text-slate-300 sm:text-lg">
+            Descubre cómo se percibe tu web desde claridad, confianza, conversión y experiencia móvil.
+          </p>
+        </div>
       </div>
-    </div>
-  );
 
-  const renderUrlScreen = () => (
-    <div className="mx-auto w-full max-w-3xl py-4 sm:py-8">
-      <div className="space-y-3">
-        <p className="text-sm uppercase tracking-[0.28em] text-slate-500">Sitio web</p>
-        <h2 className="text-3xl font-semibold leading-tight text-white sm:text-4xl">Introduce la URL.</h2>
-      </div>
-      <div className="mt-10 flex flex-col gap-5 sm:flex-row sm:items-end">
-        <label className="flex-1">
-          <span className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-slate-500">URL</span>
+      <form className="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-end" onSubmit={handleHeroSubmit}>
+        <label className="block">
+          <span className="mb-3 block text-xs font-medium uppercase tracking-[0.2em] text-slate-500">URL</span>
           <input
             value={siteUrl}
             onChange={(event) => setSiteUrl(event.target.value)}
-            placeholder="https://tumarca.com"
-            className="w-full rounded-2xl border border-white/10 bg-slate-900/45 px-4 py-4 text-sm text-slate-100 outline-none transition focus:border-amber-300/70 focus:ring-2 focus:ring-amber-300/15"
+            placeholder="https://tuweb.com"
+            type="url"
+            className="w-full rounded-2xl border border-white/10 bg-slate-900/55 px-5 py-4 text-base text-slate-100 outline-none transition placeholder:text-slate-600 focus:border-amber-300/70 focus:ring-2 focus:ring-amber-300/15"
           />
         </label>
         <button
-          type="button"
-          onClick={handleUrlNext}
-          disabled={!siteUrl}
-          className="inline-flex items-center justify-center rounded-full bg-white px-6 py-4 text-sm font-semibold uppercase tracking-[0.18em] text-slate-950 transition duration-300 enabled:hover:-translate-y-0.5 enabled:hover:bg-amber-200 disabled:cursor-not-allowed disabled:opacity-50"
+          type="submit"
+          disabled={!siteUrl.trim()}
+          className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-amber-400 to-rose-400 px-6 py-4 text-sm font-semibold uppercase tracking-[0.18em] text-slate-950 transition duration-300 enabled:hover:-translate-y-0.5 enabled:hover:shadow-lg enabled:hover:shadow-amber-400/20 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          Continuar
+          Iniciar análisis
         </button>
-      </div>
-    </div>
+      </form>
+    </section>
   );
 
   const renderQuestionScreen = () => {
@@ -743,21 +737,22 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
       <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-12 px-6 py-12 sm:px-10 sm:py-16 lg:px-16 lg:py-20">
-        <div className="space-y-5">
-          <h1 className="max-w-4xl text-4xl font-semibold leading-tight text-white sm:text-5xl">
-            Diagnóstico web estratégico
-          </h1>
-          <p className="max-w-3xl text-base leading-8 text-slate-300 sm:text-lg">
-            Selecciona las opciones que mejor describen la situación actual de tu sitio.
-          </p>
-          <p className="text-sm leading-6 text-slate-500">
-            Este análisis evalúa claridad, percepción, conversión y experiencia móvil.
-          </p>
-        </div>
+        {stage !== "hero" ? (
+          <div className="space-y-5">
+            <h1 className="max-w-4xl text-4xl font-semibold leading-tight text-white sm:text-5xl">
+              Diagnóstico web estratégico
+            </h1>
+            <p className="max-w-3xl text-base leading-8 text-slate-300 sm:text-lg">
+              Selecciona las opciones que mejor describen la situación actual de tu sitio.
+            </p>
+            <p className="text-sm leading-6 text-slate-500">
+              Este análisis evalúa claridad, percepción, conversión y experiencia móvil.
+            </p>
+          </div>
+        ) : null}
 
         <div key={stage} aria-label={stageTitle} className="flex-1 animate-stage-in">
           {stage === "hero" && renderHero()}
-          {stage === "url" && renderUrlScreen()}
           {stage === "questions" && renderQuestionScreen()}
           {stage === "loading" && renderLoading()}
           {stage === "email" && renderEmailGate()}
