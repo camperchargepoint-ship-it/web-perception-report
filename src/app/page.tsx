@@ -336,40 +336,53 @@ export default function Home() {
   };
 
   const renderHero = () => (
-    <section className="mx-auto flex min-h-[62vh] w-full max-w-4xl flex-col justify-center gap-10 py-8 sm:py-14">
-      <div className="space-y-6">
-        <span className="inline-flex items-center rounded-full border border-amber-300/20 bg-amber-300/10 px-4 py-2 text-xs font-medium uppercase tracking-[0.24em] text-amber-200">
-          Diagnóstico premium
-        </span>
-        <div className="space-y-5">
-          <h1 className="max-w-4xl text-5xl font-semibold leading-[1.05] text-white sm:text-6xl lg:text-7xl">
-            Análisis estratégico de tu sitio web
-          </h1>
-          <p className="max-w-2xl text-base leading-8 text-slate-300 sm:text-lg">
-            Descubre cómo se percibe tu web desde claridad, confianza, conversión y experiencia móvil.
-          </p>
+    <section className="relative mx-auto flex min-h-[68vh] w-full max-w-5xl items-center justify-center py-6 sm:py-10">
+      <div className="absolute inset-x-8 top-10 h-72 rounded-full bg-amber-300/10 blur-3xl" />
+      <div className="absolute bottom-8 left-1/2 h-64 w-3/4 -translate-x-1/2 rounded-full bg-rose-300/10 blur-3xl" />
+
+      <div className="relative w-full overflow-hidden rounded-[32px] border border-white/10 bg-[linear-gradient(145deg,rgba(15,23,42,0.94),rgba(2,6,23,0.9))] p-6 shadow-[0_40px_140px_rgba(0,0,0,0.45)] backdrop-blur-xl sm:p-10 lg:p-14">
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-200/60 to-transparent" />
+        <div className="absolute right-0 top-0 h-48 w-48 rounded-full bg-amber-300/10 blur-2xl" />
+
+        <div className="relative grid gap-10 lg:grid-cols-[1fr_0.82fr] lg:items-end">
+          <div className="space-y-7">
+            <span className="inline-flex items-center rounded-full border border-amber-300/25 bg-amber-300/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.26em] text-amber-200 shadow-[0_0_40px_rgba(251,191,36,0.08)]">
+              DIAGNÓSTICO PREMIUM
+            </span>
+            <div className="space-y-5">
+              <h1 className="max-w-3xl text-5xl font-semibold leading-[1.02] text-white sm:text-6xl lg:text-7xl">
+                Análisis estratégico de tu sitio web
+              </h1>
+              <p className="max-w-2xl text-base leading-8 text-slate-300 sm:text-lg">
+                Evalúa cómo se percibe tu web en claridad, confianza, conversión y experiencia móvil.
+              </p>
+            </div>
+          </div>
+
+          <form
+            className="rounded-[26px] border border-white/10 bg-white/[0.045] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] sm:p-5"
+            onSubmit={handleHeroSubmit}
+          >
+            <label className="block">
+              <span className="mb-3 block text-xs font-medium uppercase tracking-[0.2em] text-slate-500">URL</span>
+              <input
+                value={siteUrl}
+                onChange={(event) => setSiteUrl(event.target.value)}
+                placeholder="https://tuweb.com"
+                type="url"
+                className="w-full rounded-2xl border border-white/10 bg-slate-950/70 px-5 py-4 text-base text-slate-100 outline-none transition placeholder:text-slate-600 focus:border-amber-300/70 focus:ring-2 focus:ring-amber-300/15"
+              />
+            </label>
+            <button
+              type="submit"
+              disabled={!siteUrl.trim()}
+              className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-amber-400 to-rose-400 px-6 py-4 text-sm font-semibold uppercase tracking-[0.18em] text-slate-950 transition duration-300 enabled:hover:-translate-y-0.5 enabled:hover:shadow-lg enabled:hover:shadow-amber-400/20 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Iniciar análisis
+            </button>
+          </form>
         </div>
       </div>
-
-      <form className="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-end" onSubmit={handleHeroSubmit}>
-        <label className="block">
-          <span className="mb-3 block text-xs font-medium uppercase tracking-[0.2em] text-slate-500">URL</span>
-          <input
-            value={siteUrl}
-            onChange={(event) => setSiteUrl(event.target.value)}
-            placeholder="https://tuweb.com"
-            type="url"
-            className="w-full rounded-2xl border border-white/10 bg-slate-900/55 px-5 py-4 text-base text-slate-100 outline-none transition placeholder:text-slate-600 focus:border-amber-300/70 focus:ring-2 focus:ring-amber-300/15"
-          />
-        </label>
-        <button
-          type="submit"
-          disabled={!siteUrl.trim()}
-          className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-amber-400 to-rose-400 px-6 py-4 text-sm font-semibold uppercase tracking-[0.18em] text-slate-950 transition duration-300 enabled:hover:-translate-y-0.5 enabled:hover:shadow-lg enabled:hover:shadow-amber-400/20 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          Iniciar análisis
-        </button>
-      </form>
     </section>
   );
 
