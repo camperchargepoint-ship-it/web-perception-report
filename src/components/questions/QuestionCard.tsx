@@ -24,18 +24,15 @@ export function QuestionCard({
   onSelect,
 }: QuestionCardProps) {
   return (
-    <section className="mx-auto max-w-3xl rounded-[32px] border border-white/10 bg-slate-950/90 px-6 py-8 shadow-[0_40px_120px_rgba(15,23,42,0.35)] backdrop-blur-xl sm:px-8 sm:py-10">
-      <div className="mb-6 flex flex-col gap-4">
+    <section className="mx-auto max-w-3xl px-0 py-2">
+      <div className="mb-8 flex flex-col gap-5">
         <div className="flex flex-col gap-3 text-slate-200">
-          <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs uppercase tracking-[0.24em] text-slate-300 shadow-sm shadow-black/10">
-            Resumen premium
-          </span>
           <div className="space-y-2">
-            <h2 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+            <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
               {question}
             </h2>
             {subtitle ? (
-              <p className="max-w-2xl text-sm leading-6 text-slate-400 sm:text-base">
+              <p className="max-w-2xl text-base leading-7 text-slate-400">
                 {subtitle}
               </p>
             ) : null}
@@ -63,17 +60,17 @@ export function QuestionCard({
               key={option.id}
               type="button"
               onClick={() => onSelect(option.id)}
-              className={`group transform rounded-3xl border px-5 py-6 text-left transition duration-300 hover:-translate-y-0.5 hover:border-amber-300/40 hover:bg-slate-900/80 ${
+              className={`group transform rounded-2xl border px-5 py-5 text-left transition duration-300 hover:-translate-y-0.5 hover:border-amber-300/40 hover:bg-slate-900/55 ${
                 selected
-                  ? "border-amber-400/60 bg-amber-500/10 shadow-[0_24px_60px_rgba(251,191,36,0.08)]"
-                  : "border-white/10 bg-slate-900/70"
+                  ? "border-amber-400/60 bg-amber-500/10 shadow-[0_18px_48px_rgba(251,191,36,0.06)]"
+                  : "border-white/10 bg-slate-900/35"
               }`}
             >
               <div className="flex items-center justify-between gap-3">
                 <span className="text-sm font-semibold tracking-tight text-white">
                   {option.label}
                 </span>
-                <span className={`inline-flex h-9 w-9 items-center justify-center rounded-2xl border text-xs font-semibold transition ${
+                <span className={`inline-flex h-8 w-8 items-center justify-center rounded-full border text-xs font-semibold transition ${
                   selected
                     ? "border-amber-400/70 bg-amber-400/15 text-amber-300"
                     : "border-white/10 bg-white/5 text-slate-400 group-hover:border-amber-300/50 group-hover:text-amber-200"
@@ -81,26 +78,9 @@ export function QuestionCard({
                   {selected ? "✓" : ""}
                 </span>
               </div>
-              {option.description ? (
-                <p className="mt-4 text-sm leading-6 text-slate-400">
-                  {option.description}
-                </p>
-              ) : null}
             </button>
           );
         })}
-      </div>
-
-      <div className="mt-8 flex flex-col gap-3 rounded-3xl border border-white/10 bg-slate-900/70 p-5 text-slate-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="text-sm uppercase tracking-[0.22em] text-slate-500">Qué esperar</p>
-          <p className="mt-2 max-w-2xl text-base leading-7 text-slate-200">
-            Selecciona la opción que mejor describe tu sitio. Cada elección afina la estrategia y mantiene el tono premium.
-          </p>
-        </div>
-        <div className="rounded-3xl bg-slate-950/80 px-4 py-3 text-sm font-medium text-slate-100 shadow-lg shadow-black/30 ring-1 ring-white/5">
-          {selectedOptionId ? "Opción seleccionada" : "Selecciona una opción"}
-        </div>
       </div>
     </section>
   );

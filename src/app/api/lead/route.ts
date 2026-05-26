@@ -243,7 +243,7 @@ const buildLeadEmail = (lead: EnrichedLeadPayload) => {
   return {
     subject: `Nuevo lead de auditoría web: ${lead.nombre}`,
     text: [
-      "Nuevo lead desde la auditoría web premium.",
+      "Nuevo lead desde el diagnóstico web estratégico.",
       "",
       `Nombre: ${lead.nombre}`,
       `Email: ${lead.email}`,
@@ -263,7 +263,7 @@ const buildLeadEmail = (lead: EnrichedLeadPayload) => {
     ].join("\n"),
     html: `
       <div style="font-family: Arial, sans-serif; color: #111827; line-height: 1.6;">
-        <h1 style="font-size: 22px; margin-bottom: 16px;">Nuevo lead desde la auditoría web premium</h1>
+        <h1 style="font-size: 22px; margin-bottom: 16px;">Nuevo lead desde el diagnóstico web estratégico</h1>
         <p><strong>Nombre:</strong> ${escapeHtml(lead.nombre)}</p>
         <p><strong>Email:</strong> ${escapeHtml(lead.email)}</p>
         <p><strong>Web:</strong> ${escapeHtml(lead.web)}</p>

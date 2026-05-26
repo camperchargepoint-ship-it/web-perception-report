@@ -108,7 +108,7 @@ function deriveOpportunities(scores: Record<string, number>): string[] {
 
   if (opportunities.length === 0) {
     opportunities.push(
-      "Sigue refinando con ajustes estratégicos que refuercen tu posición premium sin perder elegancia." 
+      "Sigue refinando con ajustes estratégicos que refuercen una posición clara y consistente." 
     );
   }
 
@@ -158,7 +158,7 @@ export const mockDiagnosisExamples = {
     },
     {
       brandName: "Elevate Studio",
-      focus: "audiencia premium",
+      focus: "claridad estratégica",
     }
   ),
   medium: diagnoseKPIs(

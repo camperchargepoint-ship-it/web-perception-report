@@ -190,20 +190,20 @@ export default function Home() {
   });
 
   const progressLabel = useMemo(
-    () => `${currentQuestion + 1} / ${questionSteps.length}`,
+    () => `${currentQuestion + 1} de ${questionSteps.length}`,
     [currentQuestion]
   );
 
   const stageTitle = useMemo(() => {
     switch (stage) {
       case "hero":
-        return "Auditoría de lujo diseñada para sitios premium.";
+        return "Diagnóstico web estratégico";
       case "url":
         return "Comienza con la página que deseas fortalecer.";
       case "questions":
         return questionSteps[currentQuestion].question;
       case "loading":
-        return "Afinando tu auditoría premium…";
+        return "Preparando diagnóstico";
       case "email":
         return "Un último paso antes de recibir tu informe.";
       case "results":
@@ -227,7 +227,7 @@ export default function Home() {
     setAnswers((prev) => ({
       ...prev,
       brandPositioning: getHostnameFromUrl(trimmedSiteUrl),
-      strategicFocus: "audiencia premium",
+      strategicFocus: "claridad, conversión y experiencia móvil",
     }));
     setGateFormData((prev) => ({
       ...prev,
@@ -327,7 +327,7 @@ export default function Home() {
       setWebsiteAnalysis(receivedWebsiteAnalysis);
       setScreenshotUrls(receivedScreenshotUrls);
       setLeadSubmissionStatus("success");
-      setLeadSubmissionMessage("Datos enviados correctamente. Tu informe completo ya está desbloqueado.");
+      setLeadSubmissionMessage("Datos enviados correctamente. Tu informe está listo.");
       setStage("results");
     } catch (error) {
       console.error("[lead-form] Fallo en el envío del lead", error);
@@ -337,39 +337,25 @@ export default function Home() {
   };
 
   const renderHero = () => (
-    <div className="mx-auto flex w-full max-w-4xl flex-col gap-10 rounded-[28px] border border-white/5 bg-slate-950/80 p-10 shadow-[0_40px_120px_rgba(10,14,28,0.28)] backdrop-blur-xl md:p-16">
-      <div className="space-y-4 text-center sm:text-left">
-        <p className="text-sm uppercase tracking-[0.28em] text-amber-300/90">Auditoría ejecutiva</p>
-        <h1 className="text-4xl font-semibold leading-tight text-white sm:text-6xl">
-          Diagnóstico web para una presencia digital refinada.
-        </h1>
-        <p className="max-w-2xl text-base leading-8 text-slate-400 sm:text-lg">
-          Avanza por un flujo diagnóstico premium, descubre oportunidades estratégicas y recibe un informe diseñado para marcas de alto nivel.
-        </p>
-      </div>
-      <div className="flex flex-col gap-4 sm:flex-row">
+    <div className="mx-auto flex w-full max-w-3xl flex-col items-start gap-8 py-6 sm:py-10">
+      <div className="h-px w-full bg-white/10" />
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
         <button
           type="button"
           onClick={handleStart}
-          className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-amber-400 to-rose-400 px-6 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-slate-950 transition duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-amber-400/20"
+          className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-slate-950 transition duration-300 hover:-translate-y-0.5 hover:bg-amber-200"
         >
-          Iniciar auditoría
+          Empezar
         </button>
-        <p className="max-w-xl text-sm leading-6 text-slate-500">
-          El flujo es ligero, responsivo y diseñado para sentirse como una revisión editorial y sofisticada.
-        </p>
       </div>
     </div>
   );
 
   const renderUrlScreen = () => (
-    <div className="mx-auto w-full max-w-3xl rounded-[28px] border border-white/5 bg-slate-950/80 p-8 shadow-[0_40px_120px_rgba(10,14,28,0.28)] backdrop-blur-xl sm:p-12">
-      <div className="space-y-4">
-        <p className="text-sm uppercase tracking-[0.28em] text-slate-500">Entrada de sitio</p>
-        <h2 className="text-3xl font-semibold leading-tight text-white sm:text-4xl">Introduce la página que quieres revisar.</h2>
-        <p className="max-w-2xl text-sm leading-6 text-slate-400">
-          Este paso enmarca el análisis, mientras las siguientes pantallas se centran en señales clave de experiencia.
-        </p>
+    <div className="mx-auto w-full max-w-3xl py-4 sm:py-8">
+      <div className="space-y-3">
+        <p className="text-sm uppercase tracking-[0.28em] text-slate-500">Sitio web</p>
+        <h2 className="text-3xl font-semibold leading-tight text-white sm:text-4xl">Introduce la URL.</h2>
       </div>
       <div className="mt-10 flex flex-col gap-5 sm:flex-row sm:items-end">
         <label className="flex-1">
@@ -378,14 +364,14 @@ export default function Home() {
             value={siteUrl}
             onChange={(event) => setSiteUrl(event.target.value)}
             placeholder="https://tumarca.com"
-            className="w-full rounded-3xl border border-white/10 bg-slate-900/80 px-4 py-4 text-sm text-slate-100 outline-none transition focus:border-amber-300/70 focus:ring-2 focus:ring-amber-300/15"
+            className="w-full rounded-2xl border border-white/10 bg-slate-900/45 px-4 py-4 text-sm text-slate-100 outline-none transition focus:border-amber-300/70 focus:ring-2 focus:ring-amber-300/15"
           />
         </label>
         <button
           type="button"
           onClick={handleUrlNext}
           disabled={!siteUrl}
-          className="inline-flex items-center justify-center rounded-full bg-white/10 px-6 py-4 text-sm font-semibold uppercase tracking-[0.18em] text-white transition duration-300 enabled:hover:-translate-y-0.5 enabled:hover:bg-amber-400 enabled:hover:text-slate-950 disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex items-center justify-center rounded-full bg-white px-6 py-4 text-sm font-semibold uppercase tracking-[0.18em] text-slate-950 transition duration-300 enabled:hover:-translate-y-0.5 enabled:hover:bg-amber-200 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Continuar
         </button>
@@ -397,19 +383,15 @@ export default function Home() {
     const current = questionSteps[currentQuestion];
     return (
       <div className="space-y-10">
-        <div className="flex flex-col gap-5 rounded-[28px] border border-white/5 bg-slate-950/80 p-7 shadow-[0_30px_80px_rgba(10,14,28,0.24)] sm:p-10">
+        <div className="flex flex-col gap-8 py-2 sm:py-6">
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="text-xs uppercase tracking-[0.28em] text-slate-500">Pregunta</p>
-              <p className="mt-2 text-sm text-slate-400">{progressLabel} de {questionSteps.length}</p>
-            </div>
-            <div className="rounded-full bg-slate-900/80 px-4 py-2 text-xs uppercase tracking-[0.22em] text-amber-300 ring-1 ring-white/10">
-              {Math.round(((currentQuestion + 1) / questionSteps.length) * 100)}%
+              <p className="mt-2 text-sm text-slate-400">{progressLabel}</p>
             </div>
           </div>
           <QuestionCard
             question={current.question}
-            subtitle={current.subtitle}
             options={current.options}
             selectedOptionId={selectedOptionId}
             progress={(currentQuestion + 1) / questionSteps.length}
@@ -420,7 +402,7 @@ export default function Home() {
           <button
             type="button"
             onClick={handleNextQuestion}
-            className="inline-flex items-center justify-center rounded-full bg-amber-400 px-6 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-slate-950 transition duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-amber-400/25"
+            className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-slate-950 transition duration-300 hover:-translate-y-0.5 hover:bg-amber-200"
           >
             {currentQuestion === questionSteps.length - 1 ? "Generar auditoría" : "Siguiente pregunta"}
           </button>
@@ -430,14 +412,11 @@ export default function Home() {
   };
 
   const renderLoading = () => (
-    <div className="mx-auto flex w-full max-w-3xl flex-col items-center justify-center rounded-[28px] border border-white/5 bg-slate-950/80 px-10 py-20 text-center shadow-[0_40px_120px_rgba(10,14,28,0.28)] backdrop-blur-xl">
-      <div className="mb-6 h-20 w-20 rounded-full bg-gradient-to-br from-amber-400 via-rose-400 to-violet-500 shadow-[0_20px_80px_rgba(251,191,36,0.18)]">
-        <div className="mx-auto mt-6 h-8 w-8 animate-pulse rounded-full bg-slate-950" />
+    <div className="mx-auto flex w-full max-w-3xl flex-col items-center justify-center px-8 py-20 text-center">
+      <div className="mb-8 h-2 w-36 overflow-hidden rounded-full bg-white/10">
+        <div className="h-full w-1/2 animate-pulse rounded-full bg-amber-300" />
       </div>
-      <h2 className="text-3xl font-semibold text-white">Preparando tu auditoría de lujo</h2>
-      <p className="mt-4 max-w-xl text-sm leading-7 text-slate-400">
-        El sistema está alineando tus respuestas con una revisión estratégica y de alto nivel. Esto solo tarda un momento.
-      </p>
+      <h2 className="text-3xl font-semibold text-white">Preparando diagnóstico</h2>
     </div>
   );
 
@@ -446,13 +425,10 @@ export default function Home() {
     const isSubmitting = leadSubmissionStatus === "submitting";
 
     return (
-      <div className="mx-auto w-full max-w-3xl rounded-[28px] border border-white/5 bg-slate-950/80 p-8 shadow-[0_40px_120px_rgba(10,14,28,0.28)] backdrop-blur-xl sm:p-12">
-        <div className="space-y-6 text-center">
-          <p className="text-sm uppercase tracking-[0.28em] text-amber-300/90">Acceso exclusivo</p>
-          <h2 className="text-4xl font-semibold leading-tight text-white sm:text-5xl">Recibe tu informe estratégico personalizado.</h2>
-          <p className="max-w-2xl mx-auto text-sm leading-7 text-slate-400">
-            Completa los datos para desbloquear tu auditoría premium y conservar los hallazgos para futuras consultas.
-          </p>
+      <div className="mx-auto w-full max-w-3xl py-4 sm:py-8">
+        <div className="space-y-4 text-center">
+          <p className="text-sm uppercase tracking-[0.28em] text-amber-300/90">Informe</p>
+          <h2 className="text-4xl font-semibold leading-tight text-white sm:text-5xl">Recibe tu diagnóstico.</h2>
         </div>
         <form className="mt-12 space-y-5" onSubmit={handleSubmitEmail}>
           <div className="grid gap-5 sm:grid-cols-2">
@@ -466,7 +442,7 @@ export default function Home() {
                 placeholder="Tu nombre completo"
                 autoComplete="name"
                 required
-                className="w-full rounded-3xl border border-white/10 bg-slate-900/80 px-4 py-4 text-sm text-slate-100 outline-none transition focus:border-amber-300/70 focus:ring-2 focus:ring-amber-300/15"
+                className="w-full rounded-2xl border border-white/10 bg-slate-900/45 px-4 py-4 text-sm text-slate-100 outline-none transition focus:border-amber-300/70 focus:ring-2 focus:ring-amber-300/15"
               />
             </label>
             <label>
@@ -479,7 +455,7 @@ export default function Home() {
                 placeholder="tu@empresa.com"
                 autoComplete="email"
                 required
-                className="w-full rounded-3xl border border-white/10 bg-slate-900/80 px-4 py-4 text-sm text-slate-100 outline-none transition focus:border-amber-300/70 focus:ring-2 focus:ring-amber-300/15"
+                className="w-full rounded-2xl border border-white/10 bg-slate-900/45 px-4 py-4 text-sm text-slate-100 outline-none transition focus:border-amber-300/70 focus:ring-2 focus:ring-amber-300/15"
               />
             </label>
           </div>
@@ -493,16 +469,16 @@ export default function Home() {
               placeholder="https://tumarca.com"
               autoComplete="url"
               required
-              className="w-full rounded-3xl border border-white/10 bg-slate-900/80 px-4 py-4 text-sm text-slate-100 outline-none transition focus:border-amber-300/70 focus:ring-2 focus:ring-amber-300/15"
+              className="w-full rounded-2xl border border-white/10 bg-slate-900/45 px-4 py-4 text-sm text-slate-100 outline-none transition focus:border-amber-300/70 focus:ring-2 focus:ring-amber-300/15"
             />
           </label>
           <div className="pt-4">
             <button
               type="submit"
               disabled={!isFormValid || isSubmitting}
-              className="w-full inline-flex items-center justify-center rounded-full bg-gradient-to-r from-amber-400 to-rose-400 px-6 py-4 text-sm font-semibold uppercase tracking-[0.18em] text-slate-950 transition duration-300 enabled:hover:-translate-y-0.5 enabled:hover:shadow-lg enabled:hover:shadow-amber-400/25 disabled:cursor-not-allowed disabled:opacity-50"
+              className="w-full inline-flex items-center justify-center rounded-full bg-white px-6 py-4 text-sm font-semibold uppercase tracking-[0.18em] text-slate-950 transition duration-300 enabled:hover:-translate-y-0.5 enabled:hover:bg-amber-200 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {isSubmitting ? "Enviando acceso" : "Desbloquear informe completo"}
+              {isSubmitting ? "Enviando" : "Ver informe"}
             </button>
           </div>
         </form>
@@ -511,12 +487,6 @@ export default function Home() {
             {leadSubmissionMessage}
           </div>
         ) : null}
-        <div className="mt-8 rounded-3xl border border-white/10 bg-slate-900/70 p-5 text-slate-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
-          <p className="text-xs uppercase tracking-[0.22em] text-slate-500">Privacidad protegida</p>
-          <p className="mt-2 text-sm leading-6 text-slate-400">
-            Tu información se conservará de forma confidencial y solo se utilizará para enviar tu informe y futuras actualizaciones relevantes.
-          </p>
-        </div>
       </div>
     );
   };
@@ -706,7 +676,7 @@ export default function Home() {
     return (
       <div className="mx-auto w-full max-w-6xl space-y-14 rounded-[28px] bg-slate-950/70 px-6 py-10 shadow-[0_40px_120px_rgba(10,14,28,0.28)] backdrop-blur-xl sm:px-10 sm:py-14 lg:px-14">
         <div className="space-y-7">
-          <p className="text-sm uppercase tracking-[0.28em] text-amber-300/90">Resultado premium</p>
+          <p className="text-sm uppercase tracking-[0.28em] text-amber-300/90">Resultado</p>
           <h2 className="max-w-4xl text-4xl font-semibold leading-tight text-white sm:text-5xl">Una lectura estratégica de tu presencia digital.</h2>
           {leadSubmissionStatus === "success" ? (
             <div className="max-w-3xl rounded-2xl border border-emerald-300/20 bg-emerald-300/10 px-5 py-4 text-sm leading-7 text-emerald-100">
@@ -714,7 +684,7 @@ export default function Home() {
             </div>
           ) : null}
           <p className="max-w-3xl text-lg leading-9 text-slate-300">
-            {report?.summary || "Tu revisión premium está lista."}
+            {report?.summary || "Tu informe está listo."}
           </p>
         </div>
         <div className="grid gap-12 border-t border-white/10 pt-10 lg:grid-cols-[1.15fr_0.85fr] sm:pt-14">
@@ -772,14 +742,16 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
-      <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-12 px-6 py-12 sm:px-10 sm:py-16 lg:px-16 lg:py-20">
+      <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-12 px-6 py-12 sm:px-10 sm:py-16 lg:px-16 lg:py-20">
         <div className="space-y-5">
-          <p className="text-xs uppercase tracking-[0.32em] text-amber-300/80">Diagnóstico premium</p>
           <h1 className="max-w-4xl text-4xl font-semibold leading-tight text-white sm:text-5xl">
-            Revisión web de alto nivel con un tono editorial y minimalista.
+            Diagnóstico web estratégico
           </h1>
-          <p className="max-w-3xl text-base leading-8 text-slate-400 sm:text-lg">
-            El flujo está diseñado para sentirse calmado, cuidado y excepcional en cada pantalla.
+          <p className="max-w-3xl text-base leading-8 text-slate-300 sm:text-lg">
+            Selecciona las opciones que mejor describen la situación actual de tu sitio.
+          </p>
+          <p className="text-sm leading-6 text-slate-500">
+            Este análisis evalúa claridad, percepción, conversión y experiencia móvil.
           </p>
         </div>
 
