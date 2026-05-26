@@ -11,13 +11,33 @@ export type DiagnosisReport = {
   interpretedScores: Record<string, number>;
 };
 
-const scoreLabels: Array<[number, string]> = [
-  [0.8, "muy refinado"],
-  [0.65, "sólido"],
-  [0.5, "emergente"],
-  [0.35, "desigual"],
-  [0, "suboptimizado"],
-];
+const scoreDiagnostics: Record<string, { high: string; medium: string; low: string }> = {
+  claridad: {
+    high: "El mensaje principal se entiende rápidamente y transmite una propuesta clara.",
+    medium: "La propuesta se percibe, aunque algunos bloques generan fricción visual o conceptual.",
+    low: "El usuario necesita demasiado esfuerzo para comprender qué ofrece realmente la marca.",
+  },
+  confianza: {
+    high: "La presencia visual transmite profesionalidad y coherencia.",
+    medium: "La base es correcta, aunque algunos elementos reducen la percepción de solidez.",
+    low: "La experiencia actual puede generar dudas en la primera impresión.",
+  },
+  percepcionDeMarca: {
+    high: "La identidad visual tiene personalidad y una dirección clara.",
+    medium: "La marca funciona, aunque todavía resulta algo genérica.",
+    low: "La percepción visual no refleja todavía el valor real del proyecto.",
+  },
+  conversion: {
+    high: "La estructura acompaña correctamente al usuario hacia la acción.",
+    medium: "Existen oportunidades para mejorar foco y llamadas a la acción.",
+    low: "El flujo actual no guía claramente hacia la conversión.",
+  },
+  experienciaMovil: {
+    high: "La experiencia móvil se percibe fluida y bien resuelta.",
+    medium: "La navegación funciona, aunque algunos elementos podrían optimizarse.",
+    low: "La experiencia móvil presenta fricción visual o funcional.",
+  },
+};
 
 function normalizeScore(value: number): number {
   const clamped = Math.max(0, Math.min(0.99, value));
@@ -38,18 +58,19 @@ function getLabelName(name: string) {
 
 function interpretScore(name: string, value: number): string {
   const normalized = normalizeScore(value);
-  const label = scoreLabels.find(([threshold]) => normalized >= threshold)?.[1] ?? "en desarrollo";
-  return `${getLabelName(name)} está en ${Math.round(normalized * 100)}%, lo que se percibe como ${label} para una experiencia premium.`;
+  const level = normalized >= 0.8 ? "high" : normalized >= 0.55 ? "medium" : "low";
+  const diagnostic = scoreDiagnostics[name]?.[level] ?? `${getLabelName(name)} requiere una lectura más precisa.`;
+  return `${getLabelName(name)}: ${diagnostic}`;
 }
 
 function emotionalTone(summary: string): string {
-  return `Una voz de auditoría cuidadosamente considerada observa que ${summary}`;
+  return `La lectura estratégica sugiere una experiencia con potencial claro: ${summary}`;
 }
 
 function deriveWeakAreas(scores: Record<string, number>): string[] {
   return Object.entries(scores)
     .filter(([, value]) => normalizeScore(value) < 0.65)
-    .map(([key]) => `${getLabelName(key)} requiere atención para elevar la experiencia.`);
+    .map(([key, value]) => interpretScore(key, value));
 }
 
 function deriveOpportunities(scores: Record<string, number>): string[] {
@@ -105,9 +126,9 @@ export function diagnoseKPIs(
   const interpretations = Object.entries(normalizedScores).map(([name, value]) => interpretScore(name, value));
 
   const assessment = [
-    options.brandName ? `${options.brandName} recibe una auditoría premium equilibrada y estratégica.` : "El análisis ofrece una evaluación medida y de alto nivel.",
-    options.focus ? `Está especialmente orientado a ${options.focus}.` : "Se diseña para sentirse como una revisión UX editorial y de lujo.",
-    "Ningún componente se presenta como perfecto; el énfasis está en el impulso, la sutileza y la claridad estratégica.",
+    options.brandName ? `${options.brandName} muestra una base digital con señales que conviene leer con calma.` : "El análisis ofrece una lectura estratégica de la presencia digital.",
+    options.focus ? `La revisión se orienta especialmente a ${options.focus}.` : "El foco está en claridad, confianza, percepción de marca y capacidad de conversión.",
+    "Más que señalar errores aislados, el informe identifica dónde la experiencia puede ganar intención, elegancia y dirección.",
   ].join(" ");
 
   const emotionalSummary = emotionalTone(

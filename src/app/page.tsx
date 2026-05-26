@@ -337,10 +337,10 @@ export default function Home() {
   };
 
   const renderHero = () => (
-    <div className="mx-auto flex w-full max-w-4xl flex-col gap-8 rounded-[32px] border border-white/10 bg-slate-950/95 p-10 shadow-[0_40px_120px_rgba(10,14,28,0.45)] backdrop-blur-xl md:p-14">
+    <div className="mx-auto flex w-full max-w-4xl flex-col gap-10 rounded-[28px] border border-white/5 bg-slate-950/80 p-10 shadow-[0_40px_120px_rgba(10,14,28,0.28)] backdrop-blur-xl md:p-16">
       <div className="space-y-4 text-center sm:text-left">
         <p className="text-sm uppercase tracking-[0.28em] text-amber-300/90">Auditoría ejecutiva</p>
-        <h1 className="text-4xl font-semibold leading-tight text-white sm:text-5xl">
+        <h1 className="text-4xl font-semibold leading-tight text-white sm:text-6xl">
           Diagnóstico web para una presencia digital refinada.
         </h1>
         <p className="max-w-2xl text-base leading-8 text-slate-400 sm:text-lg">
@@ -363,15 +363,15 @@ export default function Home() {
   );
 
   const renderUrlScreen = () => (
-    <div className="mx-auto w-full max-w-3xl rounded-[32px] border border-white/10 bg-slate-950/95 p-8 shadow-[0_40px_120px_rgba(10,14,28,0.45)] backdrop-blur-xl sm:p-10">
+    <div className="mx-auto w-full max-w-3xl rounded-[28px] border border-white/5 bg-slate-950/80 p-8 shadow-[0_40px_120px_rgba(10,14,28,0.28)] backdrop-blur-xl sm:p-12">
       <div className="space-y-4">
         <p className="text-sm uppercase tracking-[0.28em] text-slate-500">Entrada de sitio</p>
-        <h2 className="text-3xl font-semibold text-white">Introduce la página que quieres revisar.</h2>
+        <h2 className="text-3xl font-semibold leading-tight text-white sm:text-4xl">Introduce la página que quieres revisar.</h2>
         <p className="max-w-2xl text-sm leading-6 text-slate-400">
           Este paso enmarca el análisis, mientras las siguientes pantallas se centran en señales clave de experiencia.
         </p>
       </div>
-      <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-end">
+      <div className="mt-10 flex flex-col gap-5 sm:flex-row sm:items-end">
         <label className="flex-1">
           <span className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-slate-500">URL</span>
           <input
@@ -396,8 +396,8 @@ export default function Home() {
   const renderQuestionScreen = () => {
     const current = questionSteps[currentQuestion];
     return (
-      <div className="space-y-8">
-        <div className="flex flex-col gap-3 rounded-[28px] border border-white/10 bg-slate-950/95 p-6 shadow-[0_30px_80px_rgba(10,14,28,0.35)] sm:p-8">
+      <div className="space-y-10">
+        <div className="flex flex-col gap-5 rounded-[28px] border border-white/5 bg-slate-950/80 p-7 shadow-[0_30px_80px_rgba(10,14,28,0.24)] sm:p-10">
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="text-xs uppercase tracking-[0.28em] text-slate-500">Pregunta</p>
@@ -430,7 +430,7 @@ export default function Home() {
   };
 
   const renderLoading = () => (
-    <div className="mx-auto flex w-full max-w-3xl flex-col items-center justify-center rounded-[32px] border border-white/10 bg-slate-950/95 px-10 py-16 text-center shadow-[0_40px_120px_rgba(10,14,28,0.45)] backdrop-blur-xl">
+    <div className="mx-auto flex w-full max-w-3xl flex-col items-center justify-center rounded-[28px] border border-white/5 bg-slate-950/80 px-10 py-20 text-center shadow-[0_40px_120px_rgba(10,14,28,0.28)] backdrop-blur-xl">
       <div className="mb-6 h-20 w-20 rounded-full bg-gradient-to-br from-amber-400 via-rose-400 to-violet-500 shadow-[0_20px_80px_rgba(251,191,36,0.18)]">
         <div className="mx-auto mt-6 h-8 w-8 animate-pulse rounded-full bg-slate-950" />
       </div>
@@ -446,16 +446,16 @@ export default function Home() {
     const isSubmitting = leadSubmissionStatus === "submitting";
 
     return (
-      <div className="mx-auto w-full max-w-3xl rounded-[32px] border border-white/10 bg-slate-950/95 p-10 shadow-[0_40px_120px_rgba(10,14,28,0.45)] backdrop-blur-xl">
-        <div className="space-y-5 text-center">
+      <div className="mx-auto w-full max-w-3xl rounded-[28px] border border-white/5 bg-slate-950/80 p-8 shadow-[0_40px_120px_rgba(10,14,28,0.28)] backdrop-blur-xl sm:p-12">
+        <div className="space-y-6 text-center">
           <p className="text-sm uppercase tracking-[0.28em] text-amber-300/90">Acceso exclusivo</p>
-          <h2 className="text-4xl font-semibold text-white">Recibe tu informe estratégico personalizado.</h2>
+          <h2 className="text-4xl font-semibold leading-tight text-white sm:text-5xl">Recibe tu informe estratégico personalizado.</h2>
           <p className="max-w-2xl mx-auto text-sm leading-7 text-slate-400">
             Completa los datos para desbloquear tu auditoría premium y conservar los hallazgos para futuras consultas.
           </p>
         </div>
-        <form className="mt-10 space-y-4" onSubmit={handleSubmitEmail}>
-          <div className="grid gap-4 sm:grid-cols-2">
+        <form className="mt-12 space-y-5" onSubmit={handleSubmitEmail}>
+          <div className="grid gap-5 sm:grid-cols-2">
             <label>
               <span className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-slate-500">Nombre</span>
               <input
@@ -530,28 +530,61 @@ export default function Home() {
       experienciaMovil: "Experiencia móvil",
     };
 
+    const getKpiDiagnostic = (key: string, value: number) => {
+      const level = value >= 0.8 ? "high" : value >= 0.55 ? "medium" : "low";
+      const copy: Record<string, Record<typeof level, string>> = {
+        claridad: {
+          high: "El mensaje principal se entiende rápidamente y transmite una propuesta clara.",
+          medium: "La propuesta se percibe, aunque algunos bloques generan fricción visual o conceptual.",
+          low: "El usuario necesita demasiado esfuerzo para comprender qué ofrece realmente la marca.",
+        },
+        confianza: {
+          high: "La presencia visual transmite profesionalidad y coherencia.",
+          medium: "La base es correcta, aunque algunos elementos reducen la percepción de solidez.",
+          low: "La experiencia actual puede generar dudas en la primera impresión.",
+        },
+        percepcionDeMarca: {
+          high: "La identidad visual tiene personalidad y una dirección clara.",
+          medium: "La marca funciona, aunque todavía resulta algo genérica.",
+          low: "La percepción visual no refleja todavía el valor real del proyecto.",
+        },
+        conversion: {
+          high: "La estructura acompaña correctamente al usuario hacia la acción.",
+          medium: "Existen oportunidades para mejorar foco y llamadas a la acción.",
+          low: "El flujo actual no guía claramente hacia la conversión.",
+        },
+        experienciaMovil: {
+          high: "La experiencia móvil se percibe fluida y bien resuelta.",
+          medium: "La navegación funciona, aunque algunos elementos podrían optimizarse.",
+          low: "La experiencia móvil presenta fricción visual o funcional.",
+        },
+      };
+
+      return copy[key]?.[level] ?? "Este indicador requiere una lectura más precisa.";
+    };
+
     const renderWebsiteAnalysis = () => (
-      <section className="rounded-[28px] border border-white/10 bg-slate-900/80 p-6 shadow-[0_24px_80px_rgba(15,23,42,0.35)] sm:p-8">
+      <section className="border-t border-white/10 pt-10 sm:pt-14">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <p className="text-xs uppercase tracking-[0.24em] text-amber-300/80">Lectura técnica</p>
-            <h3 className="mt-3 text-2xl font-semibold text-white">Análisis automático del sitio</h3>
+            <h3 className="mt-4 text-3xl font-semibold leading-tight text-white sm:text-4xl">Análisis automático del sitio</h3>
           </div>
-          <div className="rounded-full bg-slate-950/80 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-400 ring-1 ring-white/10">
+          <div className="rounded-full border border-white/10 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-400">
             {websiteAnalysis?.normalizedUrl ? "Sitio analizado" : "Análisis no disponible"}
           </div>
         </div>
 
-        <div className="mt-7 grid gap-4 md:grid-cols-2">
-          <div className="rounded-3xl border border-white/5 bg-slate-950/75 p-5">
+        <div className="mt-10 grid gap-8 md:grid-cols-2">
+          <div className="border-l border-amber-300/30 pl-5">
             <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Título de página</p>
-            <p className="mt-3 text-base leading-7 text-slate-100">
+            <p className="mt-4 text-lg leading-8 text-slate-100">
               {websiteAnalysis?.pageTitle || "No detectado"}
             </p>
           </div>
-          <div className="rounded-3xl border border-white/5 bg-slate-950/75 p-5">
+          <div className="border-l border-amber-300/30 pl-5">
             <p className="text-xs uppercase tracking-[0.18em] text-slate-500">H1 detectado</p>
-            <p className="mt-3 text-base leading-7 text-slate-100">
+            <p className="mt-4 text-lg leading-8 text-slate-100">
               {websiteAnalysis?.hasH1
                 ? websiteAnalysis.h1Text || "Sí, sin texto disponible"
                 : "No detectado"}
@@ -559,35 +592,35 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="mt-5 grid gap-5 lg:grid-cols-2">
-          <div className="rounded-3xl border border-white/5 bg-slate-950/75 p-5">
+        <div className="mt-12 grid gap-10 lg:grid-cols-2">
+          <div>
             <p className="text-xs uppercase tracking-[0.18em] text-slate-500">CTA detectados</p>
-            <ul className="mt-4 space-y-3 text-sm leading-6 text-slate-300">
+            <ul className="mt-5 space-y-3 text-sm leading-7 text-slate-300">
               {websiteAnalysis?.ctaCandidates.length ? (
                 websiteAnalysis.ctaCandidates.map((item) => (
-                  <li key={item} className="rounded-2xl bg-white/[0.03] px-4 py-3">
+                  <li key={item} className="border-b border-white/10 pb-3">
                     {item}
                   </li>
                 ))
               ) : (
-                <li className="rounded-2xl bg-white/[0.03] px-4 py-3">
+                <li className="border-b border-white/10 pb-3">
                   No se han detectado CTA claros.
                 </li>
               )}
             </ul>
           </div>
 
-          <div className="rounded-3xl border border-white/5 bg-slate-950/75 p-5">
+          <div>
             <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Notas automáticas</p>
-            <ul className="mt-4 space-y-3 text-sm leading-6 text-slate-300">
+            <ul className="mt-5 space-y-3 text-sm leading-7 text-slate-300">
               {websiteAnalysis?.notes.length ? (
                 websiteAnalysis.notes.map((item) => (
-                  <li key={item} className="rounded-2xl bg-white/[0.03] px-4 py-3">
+                  <li key={item} className="border-b border-white/10 pb-3">
                     {item}
                   </li>
                 ))
               ) : (
-                <li className="rounded-2xl bg-white/[0.03] px-4 py-3">
+                <li className="border-b border-white/10 pb-3">
                   No hay notas automáticas disponibles.
                 </li>
               )}
@@ -602,12 +635,12 @@ export default function Home() {
       title: string,
       description: string
     ) => (
-      <article className="overflow-hidden rounded-[28px] border border-white/10 bg-slate-900/80 shadow-[0_24px_80px_rgba(15,23,42,0.35)]">
-        <div className="border-b border-white/10 px-5 py-5 sm:px-6">
+      <article className="overflow-hidden rounded-[24px] border border-white/10 bg-slate-900/45">
+        <div className="border-b border-white/10 px-6 py-6 sm:px-7">
           <p className="text-xs uppercase tracking-[0.22em] text-amber-300/80">{title}</p>
-          <p className="mt-2 text-sm leading-6 text-slate-400">{description}</p>
+          <p className="mt-3 text-sm leading-7 text-slate-400">{description}</p>
         </div>
-        <div className="bg-slate-950/80 p-3 sm:p-4">
+        <div className="bg-slate-950/60 p-4 sm:p-5">
           {screenshot?.hasScreenshot && screenshot.dataUrl ? (
             <Image
               src={screenshot.dataUrl}
@@ -627,7 +660,7 @@ export default function Home() {
     );
 
     const renderScreenshotUrls = () => (
-      <div className="grid gap-3 rounded-[24px] border border-white/10 bg-slate-900/70 p-4 text-xs leading-6 text-slate-400 md:grid-cols-2">
+      <div className="grid gap-6 border-t border-white/10 pt-6 text-xs leading-6 text-slate-400 md:grid-cols-2">
         <div className="min-w-0">
           <p className="uppercase tracking-[0.18em] text-slate-500">Desktop screenshot URL</p>
           <p className="mt-2 break-all font-mono text-slate-300">
@@ -644,17 +677,17 @@ export default function Home() {
     );
 
     const renderWebsiteScreenshots = () => (
-      <section className="space-y-5">
+      <section className="space-y-8 border-t border-white/10 pt-10 sm:pt-14">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-xs uppercase tracking-[0.24em] text-amber-300/80">Vista visual</p>
-            <h3 className="mt-3 text-2xl font-semibold text-white">Capturas automáticas del sitio</h3>
+            <h3 className="mt-4 text-3xl font-semibold leading-tight text-white sm:text-4xl">Capturas automáticas del sitio</h3>
           </div>
-          <p className="max-w-md text-sm leading-6 text-slate-500">
+          <p className="max-w-md text-sm leading-7 text-slate-500">
             Referencias visuales generadas para revisar la primera impresión en escritorio y móvil.
           </p>
         </div>
-        <div className="grid gap-6 lg:grid-cols-[1.35fr_0.75fr]">
+        <div className="grid gap-8 lg:grid-cols-[1.35fr_0.75fr]">
           {renderScreenshotCard(
             websiteAnalysis?.screenshots?.desktop,
             "Vista de escritorio",
@@ -671,57 +704,62 @@ export default function Home() {
     );
 
     return (
-      <div className="mx-auto w-full max-w-5xl space-y-8 rounded-[32px] border border-white/10 bg-slate-950/95 p-6 shadow-[0_40px_120px_rgba(10,14,28,0.45)] backdrop-blur-xl sm:p-8 lg:p-10">
-        <div className="space-y-5">
+      <div className="mx-auto w-full max-w-6xl space-y-14 rounded-[28px] bg-slate-950/70 px-6 py-10 shadow-[0_40px_120px_rgba(10,14,28,0.28)] backdrop-blur-xl sm:px-10 sm:py-14 lg:px-14">
+        <div className="space-y-7">
           <p className="text-sm uppercase tracking-[0.28em] text-amber-300/90">Resultado premium</p>
-          <h2 className="text-3xl font-semibold leading-tight text-white sm:text-4xl">Resumen de auditoría</h2>
+          <h2 className="max-w-4xl text-4xl font-semibold leading-tight text-white sm:text-5xl">Una lectura estratégica de tu presencia digital.</h2>
           {leadSubmissionStatus === "success" ? (
-            <div className="rounded-3xl border border-emerald-300/20 bg-emerald-300/10 px-5 py-4 text-sm leading-6 text-emerald-100">
+            <div className="max-w-3xl rounded-2xl border border-emerald-300/20 bg-emerald-300/10 px-5 py-4 text-sm leading-7 text-emerald-100">
               {leadSubmissionMessage}
             </div>
           ) : null}
-          <p className="max-w-3xl text-base leading-7 text-slate-400">
+          <p className="max-w-3xl text-lg leading-9 text-slate-300">
             {report?.summary || "Tu revisión premium está lista."}
           </p>
         </div>
-        <div className="grid gap-6 lg:grid-cols-2">
-          <section className="rounded-[28px] border border-white/10 bg-slate-900/80 p-6 shadow-[0_24px_80px_rgba(15,23,42,0.35)]">
-            <h3 className="text-xl font-semibold text-white">Indicadores clave</h3>
-            <div className="mt-6 space-y-4">
+        <div className="grid gap-12 border-t border-white/10 pt-10 lg:grid-cols-[1.15fr_0.85fr] sm:pt-14">
+          <section>
+            <p className="text-xs uppercase tracking-[0.24em] text-amber-300/80">Indicadores clave</p>
+            <h3 className="mt-4 text-3xl font-semibold leading-tight text-white sm:text-4xl">Diagnóstico por dimensión</h3>
+            <div className="mt-10 grid gap-5">
               {report &&
                 Object.entries(report.kpiScores).map(([key, value]) => (
-                  <div key={key} className="flex items-center justify-between gap-4 rounded-3xl bg-slate-950/80 px-4 py-4">
+                  <div key={key} className="grid gap-5 border-b border-white/10 pb-6 sm:grid-cols-[7rem_1fr_4rem] sm:items-start">
                     <span className="text-sm uppercase tracking-[0.18em] text-slate-400">{labels[key] ?? key}</span>
-                    <span className="font-semibold text-white">{Math.round(value * 100)}%</span>
+                    <p className="text-base leading-8 text-slate-200">{getKpiDiagnostic(key, value)}</p>
+                    <span className="text-left text-2xl font-semibold text-white sm:text-right">{Math.round(value * 100)}%</span>
                   </div>
                 ))}
             </div>
           </section>
-          <section className="rounded-[28px] border border-white/10 bg-slate-900/80 p-6 shadow-[0_24px_80px_rgba(15,23,42,0.35)]">
-            <h3 className="text-xl font-semibold text-white">Visión estratégica</h3>
-            <p className="mt-4 text-sm leading-7 text-slate-400">{report?.diagnosis.emotionalSummary}</p>
+          <section className="self-start border-l border-amber-300/25 pl-6 sm:pl-8">
+            <p className="text-xs uppercase tracking-[0.24em] text-amber-300/80">Visión estratégica</p>
+            <h3 className="mt-4 text-2xl font-semibold leading-tight text-white">Lectura editorial</h3>
+            <p className="mt-6 text-base leading-8 text-slate-300">{report?.diagnosis.emotionalSummary}</p>
           </section>
         </div>
 
         {renderWebsiteAnalysis()}
         {renderWebsiteScreenshots()}
 
-        <div className="grid gap-6 lg:grid-cols-2">
-          <section className="rounded-[28px] border border-white/10 bg-slate-900/80 p-6 shadow-[0_24px_80px_rgba(15,23,42,0.35)]">
-            <h3 className="text-xl font-semibold text-white">Áreas débiles</h3>
-            <ul className="mt-5 space-y-3 text-slate-300">
+        <div className="grid gap-12 border-t border-white/10 pt-10 sm:pt-14 lg:grid-cols-2">
+          <section>
+            <p className="text-xs uppercase tracking-[0.24em] text-amber-300/80">Fracciones de fricción</p>
+            <h3 className="mt-4 text-3xl font-semibold leading-tight text-white">Áreas que piden atención</h3>
+            <ul className="mt-8 space-y-4 text-slate-300">
               {report?.weakAreas.map((item) => (
-                <li key={item} className="rounded-3xl border border-white/5 bg-slate-950/80 px-4 py-3">
+                <li key={item} className="border-b border-white/10 pb-4 text-sm leading-7">
                   {item}
                 </li>
               ))}
             </ul>
           </section>
-          <section className="rounded-[28px] border border-white/10 bg-slate-900/80 p-6 shadow-[0_24px_80px_rgba(15,23,42,0.35)]">
-            <h3 className="text-xl font-semibold text-white">Oportunidades de mejora</h3>
-            <ul className="mt-5 space-y-3 text-slate-300">
+          <section>
+            <p className="text-xs uppercase tracking-[0.24em] text-amber-300/80">Siguiente nivel</p>
+            <h3 className="mt-4 text-3xl font-semibold leading-tight text-white">Oportunidades de mejora</h3>
+            <ul className="mt-8 space-y-4 text-slate-300">
               {report?.improvementOpportunities.map((item) => (
-                <li key={item} className="rounded-3xl border border-white/5 bg-slate-950/80 px-4 py-3">
+                <li key={item} className="border-b border-white/10 pb-4 text-sm leading-7">
                   {item}
                 </li>
               ))}
@@ -734,13 +772,13 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
-      <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-8 px-6 py-10 sm:px-10 lg:px-14">
-        <div className="space-y-4">
+      <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-12 px-6 py-12 sm:px-10 sm:py-16 lg:px-16 lg:py-20">
+        <div className="space-y-5">
           <p className="text-xs uppercase tracking-[0.32em] text-amber-300/80">Diagnóstico premium</p>
-          <h1 className="text-3xl font-semibold leading-tight text-white sm:text-4xl">
+          <h1 className="max-w-4xl text-4xl font-semibold leading-tight text-white sm:text-5xl">
             Revisión web de alto nivel con un tono editorial y minimalista.
           </h1>
-          <p className="max-w-3xl text-sm leading-7 text-slate-400 sm:text-base">
+          <p className="max-w-3xl text-base leading-8 text-slate-400 sm:text-lg">
             El flujo está diseñado para sentirse calmado, cuidado y excepcional en cada pantalla.
           </p>
         </div>
