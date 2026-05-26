@@ -9,6 +9,10 @@ export type WebsiteAnalysis = {
   ctaCandidates: string[];
   hasCTA: boolean;
   notes: string[];
+  screenshotUrls?: {
+    desktop: string;
+    mobile: string;
+  };
   screenshots?: WebsiteScreenshots;
 };
 

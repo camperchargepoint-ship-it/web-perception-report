@@ -21,6 +21,11 @@ type QuestionStep = {
   }>;
 };
 
+type ScreenshotUrls = {
+  desktop: string;
+  mobile: string;
+};
+
 const questionSteps: QuestionStep[] = [
   {
     key: "claridad",
@@ -98,6 +103,10 @@ const createWebsiteAnalysisFallback = (web = ""): WebsiteAnalysis => ({
   ctaCandidates: [],
   hasCTA: false,
   notes: ["No se ha podido mostrar el análisis automático del sitio."],
+  screenshotUrls: {
+    desktop: "",
+    mobile: "",
+  },
   screenshots: {
     desktopUrl: "",
     mobileUrl: "",
@@ -120,7 +129,19 @@ const normalizeWebsiteAnalysis = (
   notes: Array.isArray(analysis?.notes) && analysis.notes.length > 0
     ? analysis.notes
     : createWebsiteAnalysisFallback(web).notes,
+  screenshotUrls: {
+    desktop: analysis?.screenshotUrls?.desktop || analysis?.screenshots?.desktopUrl || "",
+    mobile: analysis?.screenshotUrls?.mobile || analysis?.screenshots?.mobileUrl || "",
+  },
   screenshots: analysis?.screenshots || createWebsiteAnalysisFallback(web).screenshots,
+});
+
+const normalizeScreenshotUrls = (
+  value: Partial<ScreenshotUrls> | null | undefined,
+  analysis: WebsiteAnalysis
+): ScreenshotUrls => ({
+  desktop: value?.desktop || analysis.screenshotUrls?.desktop || analysis.screenshots?.desktopUrl || "",
+  mobile: value?.mobile || analysis.screenshotUrls?.mobile || analysis.screenshots?.mobileUrl || "",
 });
 
 const getHostnameFromUrl = (value: string) => {
@@ -163,6 +184,10 @@ export default function Home() {
   >("idle");
   const [leadSubmissionMessage, setLeadSubmissionMessage] = useState("");
   const [websiteAnalysis, setWebsiteAnalysis] = useState<WebsiteAnalysis | null>(null);
+  const [screenshotUrls, setScreenshotUrls] = useState<ScreenshotUrls>({
+    desktop: "",
+    mobile: "",
+  });
 
   const progressLabel = useMemo(
     () => `${currentQuestion + 1} / ${questionSteps.length}`,
@@ -267,7 +292,11 @@ export default function Home() {
       });
 
       const responseText = await response.text();
-      let data: { error?: string; websiteAnalysis?: WebsiteAnalysis } | null = null;
+      let data: {
+        error?: string;
+        websiteAnalysis?: WebsiteAnalysis;
+        screenshotUrls?: ScreenshotUrls;
+      } | null = null;
 
       try {
         data = responseText ? JSON.parse(responseText) : null;
@@ -289,9 +318,14 @@ export default function Home() {
         data?.websiteAnalysis,
         submittedGateData.web
       );
+      const receivedScreenshotUrls = normalizeScreenshotUrls(
+        data?.screenshotUrls,
+        receivedWebsiteAnalysis
+      );
 
-      console.error("[lead-form] Análisis automático recibido", receivedWebsiteAnalysis);
+      console.log("[lead-form] websiteAnalysis returned by /api/lead", receivedWebsiteAnalysis);
       setWebsiteAnalysis(receivedWebsiteAnalysis);
+      setScreenshotUrls(receivedScreenshotUrls);
       setLeadSubmissionStatus("success");
       setLeadSubmissionMessage("Datos enviados correctamente. Tu informe completo ya está desbloqueado.");
       setStage("results");
@@ -592,6 +626,23 @@ export default function Home() {
       </article>
     );
 
+    const renderScreenshotUrls = () => (
+      <div className="grid gap-3 rounded-[24px] border border-white/10 bg-slate-900/70 p-4 text-xs leading-6 text-slate-400 md:grid-cols-2">
+        <div className="min-w-0">
+          <p className="uppercase tracking-[0.18em] text-slate-500">Desktop screenshot URL</p>
+          <p className="mt-2 break-all font-mono text-slate-300">
+            {screenshotUrls.desktop || "No disponible"}
+          </p>
+        </div>
+        <div className="min-w-0">
+          <p className="uppercase tracking-[0.18em] text-slate-500">Mobile screenshot URL</p>
+          <p className="mt-2 break-all font-mono text-slate-300">
+            {screenshotUrls.mobile || "No disponible"}
+          </p>
+        </div>
+      </div>
+    );
+
     const renderWebsiteScreenshots = () => (
       <section className="space-y-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -615,6 +666,7 @@ export default function Home() {
             "Revisión compacta de claridad, foco y experiencia en pantalla pequeña."
           )}
         </div>
+        {renderScreenshotUrls()}
       </section>
     );
 

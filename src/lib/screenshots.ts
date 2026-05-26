@@ -70,15 +70,13 @@ const createScreenshotOneUrl = (
 };
 
 const fetchScreenshot = async (
-  targetUrl: string,
   target: ScreenshotTarget,
-  accessKey: string
+  screenshotUrl: string
 ): Promise<WebsiteScreenshot> => {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
   try {
-    const screenshotUrl = createScreenshotOneUrl(targetUrl, target, accessKey);
     const response = await fetch(screenshotUrl, {
       signal: controller.signal,
       cache: "no-store",
@@ -115,6 +113,8 @@ const fetchScreenshot = async (
 
 export async function generateWebsiteScreenshots(url: string): Promise<WebsiteScreenshots> {
   let normalizedUrl = "";
+  const accessKey = process.env.SCREENSHOTONE_ACCESS_KEY;
+  console.log("[screenshots] SCREENSHOTONE_ACCESS_KEY exists", Boolean(accessKey));
 
   try {
     normalizedUrl = normalizeUrl(url);
@@ -138,8 +138,6 @@ export async function generateWebsiteScreenshots(url: string): Promise<WebsiteSc
     };
   }
 
-  const accessKey = process.env.SCREENSHOTONE_ACCESS_KEY;
-
   if (!accessKey) {
     return {
       desktopUrl: "",
@@ -150,9 +148,17 @@ export async function generateWebsiteScreenshots(url: string): Promise<WebsiteSc
     };
   }
 
-  const [desktop, mobile] = await Promise.all(
-    targets.map((target) => fetchScreenshot(normalizedUrl, target, accessKey))
-  );
+  const [desktopTarget, mobileTarget] = targets;
+  const desktopUrl = createScreenshotOneUrl(normalizedUrl, desktopTarget, accessKey);
+  const mobileUrl = createScreenshotOneUrl(normalizedUrl, mobileTarget, accessKey);
+
+  console.log("[screenshots] Generated desktop screenshot URL", desktopUrl);
+  console.log("[screenshots] Generated mobile screenshot URL", mobileUrl);
+
+  const [desktop, mobile] = await Promise.all([
+    fetchScreenshot(desktopTarget, desktopUrl),
+    fetchScreenshot(mobileTarget, mobileUrl),
+  ]);
 
   const notes = [
     desktop.hasScreenshot
@@ -164,8 +170,8 @@ export async function generateWebsiteScreenshots(url: string): Promise<WebsiteSc
   ].filter(Boolean);
 
   return {
-    desktopUrl: desktop.dataUrl,
-    mobileUrl: mobile.dataUrl,
+    desktopUrl,
+    mobileUrl,
     desktop,
     mobile,
     notes,

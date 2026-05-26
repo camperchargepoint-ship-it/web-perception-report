@@ -430,8 +430,13 @@ export async function POST(request: Request) {
   const baseWebsiteAnalysis = await analyzeWebsite(payload.web);
   // ScreenshotOne keeps screenshot generation compatible with Vercel serverless without browser automation.
   const screenshots = await generateWebsiteScreenshots(payload.web);
+  const screenshotUrls = {
+    desktop: screenshots.desktopUrl,
+    mobile: screenshots.mobileUrl,
+  };
   const websiteAnalysis = {
     ...baseWebsiteAnalysis,
+    screenshotUrls,
     screenshots,
   };
 
@@ -444,7 +449,7 @@ export async function POST(request: Request) {
     websiteAnalysis,
   };
 
-  console.error("[lead-api] Website analysis completed", lead.websiteAnalysis);
+  console.log("[lead-api] Website analysis completed", lead.websiteAnalysis);
 
   const internalEmail = buildLeadEmail(lead);
   const internalResponse = await sendResendEmail(
@@ -497,7 +502,9 @@ export async function POST(request: Request) {
       ctaCandidates: lead.websiteAnalysis.ctaCandidates,
       hasCTA: lead.websiteAnalysis.hasCTA,
       notes: lead.websiteAnalysis.notes,
+      screenshotUrls: lead.websiteAnalysis.screenshotUrls,
       screenshots: lead.websiteAnalysis.screenshots,
     },
+    screenshotUrls: lead.websiteAnalysis.screenshotUrls,
   });
 }
